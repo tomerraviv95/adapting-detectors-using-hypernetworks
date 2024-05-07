@@ -49,7 +49,7 @@ class ChannelModelDataset(Dataset):
         database = []
         # do not change max_workers
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-            [executor.submit(self.get_data, snr, database) for snr in snr_list]
+            executor.submit(self.get_data, database)
         mx, tx, rx = (np.concatenate(arrays) for arrays in zip(*database))
         mx, tx, rx = torch.Tensor(mx).to(device=DEVICE), torch.Tensor(tx).to(device=DEVICE), torch.from_numpy(rx).to(
             device=DEVICE)

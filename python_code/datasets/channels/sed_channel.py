@@ -2,7 +2,6 @@ import numpy as np
 
 from python_code import conf
 
-H_COEF = 0.8
 MAX_SNR_PER_USER = [16, 8, 12, 14, 6, 8, 10, 9, 4, 6, 15, 16]  # Max SNR per user in dB
 MIN_SNR_PER_USER = [4, 6, 4, 2, 5, 3, 2, 5, 6, 2, 5, 6]  # Min SNR per user in dB
 TIME_BETWEEN_PEAKS = [10, 5, 13, 20, 8, 4, 3, 10, 10, 9, 13, 12]  # Number of blocks between MAX and MIN snrs
@@ -11,10 +10,13 @@ TIME_BETWEEN_PEAKS = [10, 5, 13, 20, 8, 4, 3, 10, 10, 9, 13, 12]  # Number of bl
 class SEDChannel:
     @staticmethod
     def get_channel_matrix(n_ant: int, n_user: int) -> np.ndarray:
+        # H is the users X antennas channel matrix
+        # H_row has another index of the antenna per location, for each different user
         H_row = np.array([i for i in range(n_ant)])
-        H_row = np.tile(H_row, [n_user, 1]).T
+        H_row = np.tile(H_row, [n_user, 1])
+        # H_column has another index of the user per location, for each different antenna
         H_column = np.array([i for i in range(n_user)])
-        H_column = np.tile(H_column, [n_ant, 1])
+        H_column = np.tile(H_column, [n_ant, 1]).T
         H = np.exp(-np.abs(H_row - H_column))
         return H
 
@@ -41,11 +43,14 @@ class SEDChannel:
         :param h: channel matrix function
         :return: received word y
         """
-        snrs = (10 ** (snrs / 20)).reshape(-1, 1)
-        snrs_mat = np.tile(snrs, [1, conf.n_ant])
+        snrs = (10 ** (snrs / 20))
+        snrs_mat = np.eye(conf.n_user)
+        for i in range(conf.n_user):
+            snrs_mat[i, i] = snrs[i]
+        # Users X antennas matrix. Scale each row by the SNR of the given user.
         snrs_scaled_h = np.matmul(snrs_mat, h)
-        conv = SEDChannel._compute_channel_signal_convolution(snrs_scaled_h, s)
-        w = np.random.randn(conf.n_ant, s.shape[1])
+        conv = np.matmul(s, snrs_scaled_h)
+        w = np.random.randn(s.shape[0], conf.n_ant)
         y = conv + w
         return y
 

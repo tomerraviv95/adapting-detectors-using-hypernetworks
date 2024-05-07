@@ -12,4 +12,4 @@ class Transmitter:
         snrs = SEDChannel.get_snrs(conf.n_user, index)
         # pass through datasets
         rx = SEDChannel.transmit(s=s, h=H, snrs=snrs)
-        return rx.T
+        return rx
