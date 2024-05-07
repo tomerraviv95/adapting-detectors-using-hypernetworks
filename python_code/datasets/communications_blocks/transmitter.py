@@ -7,7 +7,7 @@ from python_code.datasets.channels.sed_channel import SEDChannel
 
 
 class Transmitter:
-    def transmit(self, s: np.ndarray, index: int) -> Tuple[np.ndarray, np.ndarray]:
+    def transmit(self, s: np.ndarray, index: int) -> np.ndarray:
         H = SEDChannel.get_channel_matrix(conf.n_ant, conf.n_user)
         snrs = SEDChannel.get_snrs(conf.n_user, index)
         # pass through datasets

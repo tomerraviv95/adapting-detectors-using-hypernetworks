@@ -22,10 +22,6 @@ class ChannelModelDataset(Dataset):
         self.generator = Generator()
         self.modulator = BPSKModulator()
         self.transmitter = Transmitter()
-        assert conf.block_length % conf.message_bits == 0, (
-            "Block length must be divisible by the number of message bits for encoding!!!")
-        assert conf.pilots_length % conf.message_bits == 0, (
-            "Pilots length must be divisible by the number of message bits for encoding!!!")
 
     def get_data(self, database: list):
         if database is None:
@@ -45,7 +41,7 @@ class ChannelModelDataset(Dataset):
 
         database.append((mx_full, tx_full, rx_full))
 
-    def __getitem__(self, snr_list: List[float]) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def __getitem__(self) -> Tuple[torch.Tensor, torch.Tensor]:
         database = []
         # do not change max_workers
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
@@ -53,4 +49,4 @@ class ChannelModelDataset(Dataset):
         mx, tx, rx = (np.concatenate(arrays) for arrays in zip(*database))
         mx, tx, rx = torch.Tensor(mx).to(device=DEVICE), torch.Tensor(tx).to(device=DEVICE), torch.from_numpy(rx).to(
             device=DEVICE)
-        return mx, tx, rx
+        return mx, rx
