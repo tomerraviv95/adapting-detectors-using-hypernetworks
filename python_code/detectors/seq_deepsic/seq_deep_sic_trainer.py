@@ -27,7 +27,7 @@ class SeqDeepSICTrainer(DeepSICTrainer):
         self.optimizer = torch.optim.Adam(single_model.parameters(), lr=self.lr)
         self.criterion = torch.nn.CrossEntropyLoss()
         single_model = single_model.to(DEVICE)
-        y_total = 0.5 * torch.ones(rx.shape).to(DEVICE)
+        y_total = rx.float()
         for _ in range(EPOCHS):
             soft_estimation = single_model(y_total)
             self.run_train_loop(soft_estimation, mx)

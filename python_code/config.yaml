@@ -4,10 +4,10 @@ seed: 5 # run seed
 # MIMO protocol
 block_length: 15360 # coherence block time, total size of pilot + data. values: int.
 pilots_length: 768 # pilot bits
-blocks_num: 10 # number of validation frames. values: int.
-n_user: 4 # number of transmitting devices
-n_ant: 4 # number of received signals
+blocks_num: 30 # number of validation frames. values: int.
+n_user: 6 # number of transmitting devices
+n_ant: 12 # number of received signals
 
 # training hyperparameters
 detector_type: 'seq_model' # ['seq_model']
-hidden_base_size: 48 # size of the hidden layer in DeepSIC
+hidden_base_size: 24 # size of the hidden layer in DeepSIC

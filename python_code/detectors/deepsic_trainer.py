@@ -14,7 +14,7 @@ class DeepSICTrainer(Detector):
 
     def __init__(self):
         self.lr = 5e-3
-        self.iterations = 5
+        self.iterations = 3
         super().__init__()
 
     def __str__(self):
@@ -32,7 +32,7 @@ class DeepSICTrainer(Detector):
     def forward(self, rx: torch.Tensor, h: torch.Tensor = None) -> torch.Tensor:
         with torch.no_grad():
             # detect and decode
-            probs_vec = 0.5 * torch.ones(rx.shape).to(DEVICE).float()
+            probs_vec = 0.5 * torch.ones([rx.shape[0], conf.n_user]).to(DEVICE).float()
             for i in range(self.iterations):
                 probs_vec = self.calculate_posteriors(self.detector, i + 1, probs_vec, rx)
             detected_words = self.compute_output(probs_vec)
@@ -66,9 +66,8 @@ class DeepSICTrainer(Detector):
         for user in range(conf.n_user):
             idx = [user_i for user_i in range(conf.n_user) if user_i != user]
             input = torch.cat((rx, probs_vec[:, idx].reshape(rx.shape[0], -1)), dim=1)
-            preprocessed_input = 0.5 * torch.ones(input.shape).to(DEVICE)
             with torch.no_grad():
-                output = self.softmax(model[user][i - 1](preprocessed_input))
+                output = self.softmax(model[user][i - 1](input.float()))
             next_probs_vec[:, user] = output[:, 1:].reshape(next_probs_vec[:, user].shape)
         return next_probs_vec
 
