@@ -1,3 +1,5 @@
+from typing import List
+
 import torch
 from torch import nn
 
@@ -35,7 +37,7 @@ class OnlineHypernetworkDeepSICTrainer(DeepSICTrainer):
             output.append(self.softmax(deepsic_output))
         return torch.cat(output).to(DEVICE)
 
-    def train_model(self, hypernetwork: nn.Module, mx: torch.Tensor, rx: torch.Tensor):
+    def train_model(self, hypernetwork: nn.Module, mx: torch.Tensor, rx: torch.Tensor, plain_rx):
         """
         Trains a hypernetwork DeepSIC Network
         """
@@ -55,7 +57,7 @@ class OnlineHypernetworkDeepSICTrainer(DeepSICTrainer):
             # calculate loss and update parameters of hypernetwork
             self.run_train_loop(soft_estimation, mx)
 
-    def _online_training(self, mx: torch.Tensor, rx: torch.Tensor):
+    def _online_training(self, mx: torch.Tensor, rx: torch.Tensor, snrs_list:List[List[float]]):
         """
         Main training function for DeepSIC evaluater. Initializes the probabilities, then propagates them through the
         network, training sequentially each network and not by end-to-end manner (each one individually).
@@ -70,6 +72,6 @@ class OnlineHypernetworkDeepSICTrainer(DeepSICTrainer):
             mx_all, rx_all = self.prepare_data_for_training(mx, rx, probs_vec)
             # Training the DeepSIC networks for the iteration>1
             for j in range(conf.n_user):
-                self.train_model(self.hypernetworks[j], mx_all[j], rx_all[j])
+                self.train_model(self.hypernetworks[j], mx_all[j], rx_all[j], rx)
             # Generating soft symbols for training purposes
             probs_vec = self.calculate_posteriors(i + 1, probs_vec, rx)

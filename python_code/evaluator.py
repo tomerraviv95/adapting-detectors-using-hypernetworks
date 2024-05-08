@@ -40,7 +40,7 @@ class Evaluator(object):
         torch.cuda.empty_cache()
         ser_list, ber_list, ece_list = [], [], []
         # draw words for a given snr
-        message_words, received_words = self.channel_dataset.__getitem__()
+        message_words, received_words, snrs_list = self.channel_dataset.__getitem__()
         # detect sequentially
         for block_ind in range(conf.blocks_num):
             print('*' * 20)
@@ -51,7 +51,7 @@ class Evaluator(object):
             mx_data, rx_data = mx[conf.pilots_length:], rx[conf.pilots_length:]
             # run online training on the pilots part
             if block_ind == 0:
-                self.detector._online_training(mx_pilot, rx_pilot)
+                self.detector._online_training(mx_pilot, rx_pilot,snrs_list)
             # detect data part after training on the pilot part
             detected_words = self.detector.forward(rx_data)
             ser = calculate_error_rate(detected_words, mx_data)

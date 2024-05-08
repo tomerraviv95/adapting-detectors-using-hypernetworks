@@ -1,5 +1,3 @@
-from typing import Tuple
-
 import numpy as np
 
 from python_code import conf
@@ -12,4 +10,4 @@ class Transmitter:
         snrs = SEDChannel.get_snrs(conf.n_user, index)
         # pass through datasets
         rx = SEDChannel.transmit(s=s, h=H, snrs=snrs)
-        return rx
+        return rx, snrs

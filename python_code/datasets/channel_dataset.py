@@ -27,26 +27,25 @@ class ChannelModelDataset(Dataset):
         if database is None:
             database = []
         mx_full = np.empty((self.blocks_num, conf.block_length, conf.n_user))
-        tx_full = np.empty((self.blocks_num, conf.block_length, conf.n_user))
         rx_full = np.empty((self.blocks_num, conf.block_length, conf.n_ant))
+        snrs_list = []
         # accumulate words until reaches desired number
         for index in range(conf.blocks_num):
             mx = self.generator.generate()
             tx = self.modulator.modulate(mx)
-            rx = self.transmitter.transmit(tx, index)
+            rx, snrs = self.transmitter.transmit(tx, index)
             # accumulate
             mx_full[index] = mx
-            tx_full[index] = tx
             rx_full[index] = rx
+            snrs_list.append(snrs)
 
-        database.append((mx_full, tx_full, rx_full))
+        database.append((mx_full, rx_full, snrs_list))
 
-    def __getitem__(self) -> Tuple[torch.Tensor, torch.Tensor]:
+    def __getitem__(self) -> Tuple[torch.Tensor, torch.Tensor, List[List[float]]]:
         database = []
         # do not change max_workers
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
             executor.submit(self.get_data, database)
-        mx, tx, rx = (np.concatenate(arrays) for arrays in zip(*database))
-        mx, tx, rx = torch.Tensor(mx).to(device=DEVICE), torch.Tensor(tx).to(device=DEVICE), torch.from_numpy(rx).to(
-            device=DEVICE)
-        return mx, rx
+        mx, rx, snrs_list = (np.concatenate(arrays) for arrays in zip(*database))
+        mx, rx = torch.Tensor(mx).to(device=DEVICE), torch.from_numpy(rx).to(device=DEVICE)
+        return mx, rx, snrs_list
