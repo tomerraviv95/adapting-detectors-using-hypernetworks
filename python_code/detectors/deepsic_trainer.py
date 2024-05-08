@@ -10,7 +10,7 @@ EPOCHS = 500
 class DeepSICTrainer(Detector):
 
     def __init__(self):
-        self.lr = 5e-3
+        self.lr = 1e-3
         self.iterations = 3
         super().__init__()
 

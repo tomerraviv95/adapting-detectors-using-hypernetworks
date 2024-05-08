@@ -50,7 +50,8 @@ class Evaluator(object):
             mx_pilot, rx_pilot = mx[:conf.pilots_length], rx[:conf.pilots_length]
             mx_data, rx_data = mx[conf.pilots_length:], rx[conf.pilots_length:]
             # run online training on the pilots part
-            self.detector._online_training(mx_pilot, rx_pilot)
+            if block_ind == 0:
+                self.detector._online_training(mx_pilot, rx_pilot)
             # detect data part after training on the pilot part
             detected_words = self.detector.forward(rx_data)
             ser = calculate_error_rate(detected_words, mx_data)

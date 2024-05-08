@@ -2,8 +2,8 @@
 seed: 5 # run seed
 
 # MIMO protocol
-block_length: 15360 # coherence block time, total size of pilot + data. values: int.
-pilots_length: 100 # pilot bits
+block_length: 15000 # coherence block time, total size of pilot + data. values: int.
+pilots_length: 500 # pilot bits
 blocks_num: 30 # number of validation frames. values: int.
 n_user: 3 # number of transmitting devices
 n_ant: 12 # number of received signals

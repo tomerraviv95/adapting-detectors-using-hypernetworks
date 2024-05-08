@@ -11,13 +11,15 @@ class Hypernetwork(nn.Module):
         super(Hypernetwork, self).__init__()
         classes_num = 2
         linear_input = conf.n_ant + (classes_num - 1) * (conf.n_user - 1)
-        emb_size = 24
+        emb_size = 16
         self.activation = nn.ReLU()
         self.fc_embedding = nn.Linear(linear_input, emb_size)
+        self.fc_embedding2 = nn.Linear(emb_size, emb_size)
         self.fc_outs = nn.ModuleList([nn.Linear(emb_size, cur_params) for cur_params in parameters_num])
 
     def forward(self, rx: torch.Tensor) -> List[torch.Tensor]:
-        embedding = self.activation(self.fc_embedding(rx))
+        mid = self.activation(self.fc_embedding(rx))
+        embedding = self.activation(self.fc_embedding2(mid))
         fc_weights = []
         for i in range(len(self.fc_outs)):
             fc_weight = self.fc_outs[i](embedding)

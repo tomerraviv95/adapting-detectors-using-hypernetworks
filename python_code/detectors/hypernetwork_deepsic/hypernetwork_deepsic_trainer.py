@@ -7,7 +7,7 @@ from python_code.detectors.deepsic_trainer import DeepSICTrainer
 from python_code.detectors.hypernetwork_deepsic.hyper_deepsic import HyperDeepSICDetector
 from python_code.detectors.hypernetwork_deepsic.hypernetwork import Hypernetwork
 
-EPOCHS = 6
+EPOCHS = 10
 
 
 class OnlineHypernetworkDeepSICTrainer(DeepSICTrainer):
@@ -16,19 +16,21 @@ class OnlineHypernetworkDeepSICTrainer(DeepSICTrainer):
         super().__init__()
 
     def __str__(self):
-        return 'Online HyperNetwork-based DeepSIC'
+        return 'Online Hypernetwork-based DeepSIC'
 
     def _initialize_detector(self):
         self.base_deepsic = DeepSICDetector()
         total_parameters = [param.numel() for param in self.base_deepsic.parameters()]
         self.hypernetworks = [Hypernetwork(total_parameters).to(DEVICE) for _ in range(conf.n_user)]
         self.hyper_deepsic = HyperDeepSICDetector([param.size() for param in self.base_deepsic.parameters()])
+        self.inference_weights = [None for _ in range(conf.n_user)]
 
     def soft_symbols_from_probs(self, i, input, user):
-        all_weights = self.hypernetworks[user](input.float())
+        if i == 1:
+            self.inference_weights[user] = self.hypernetworks[user](input.float())
         output = []
         for sample_id in range(input.shape[0]):
-            cur_weights = [weight[sample_id] for weight in all_weights]
+            cur_weights = [weight[sample_id] for weight in self.inference_weights[user]]
             deepsic_output = self.hyper_deepsic(input[sample_id].float().reshape(1, -1), cur_weights)
             output.append(self.softmax(deepsic_output))
         return torch.cat(output).to(DEVICE)
