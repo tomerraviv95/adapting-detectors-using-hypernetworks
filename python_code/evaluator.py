@@ -7,6 +7,7 @@ import torch
 from python_code import conf
 from python_code.datasets.channel_dataset import ChannelModelDataset
 from python_code.detectors import DETECTORS_TYPE_DICT
+from python_code.utils.constants import Phase
 from python_code.utils.metrics import calculate_error_rate
 
 random.seed(conf.seed)
@@ -41,11 +42,11 @@ class Evaluator(object):
         torch.cuda.empty_cache()
         ser_list, ber_list, ece_list = [], [], []
         # draw words for a given snr
-        message_words, received_words, snrs_list = self.train_channel_dataset.__getitem__()
-        TRAIN = True
+        message_words, received_words, snrs_list = self.train_channel_dataset.__getitem__(phase=Phase.TRAIN)
+        TRAIN = False
         if TRAIN:
-            self.detector._online_training(message_words, received_words, snrs_list)
-        message_words, received_words, snrs_list = self.test_channel_dataset.__getitem__()
+            self.detector.joint_training(message_words, received_words, snrs_list)
+        message_words, received_words, snrs_list = self.test_channel_dataset.__getitem__(phase=Phase.TEST)
         # detect sequentially
         for block_ind in range(conf.blocks_num):
             print('*' * 20)
@@ -55,7 +56,7 @@ class Evaluator(object):
             mx_pilot, rx_pilot = mx[:conf.pilots_length], rx[:conf.pilots_length]
             mx_data, rx_data = mx[conf.pilots_length:], rx[conf.pilots_length:]
             # run online training on the pilots part
-            self.detector._online_training(mx_pilot, rx_pilot, snrs_list[block_ind])
+            self.detector._online_training(mx_pilot, rx_pilot)
             # detect data part after training on the pilot part
             detected_words = self.detector.forward(rx_data, snrs_list[block_ind])
             ser = calculate_error_rate(detected_words, mx_data)

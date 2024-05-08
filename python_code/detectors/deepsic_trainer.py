@@ -6,13 +6,13 @@ from python_code import DEVICE, conf
 from python_code.datasets.communications_blocks.modulator import BPSKModulator
 from python_code.detectors.detector_trainer import Detector
 
-EPOCHS = 50
+EPOCHS = 20
 
 
 class DeepSICTrainer(Detector):
 
     def __init__(self):
-        self.lr = 1e-3
+        self.lr = 5e-3
         self.iterations = 3
         super().__init__()
 

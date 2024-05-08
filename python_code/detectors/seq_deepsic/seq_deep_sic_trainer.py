@@ -20,7 +20,7 @@ class SeqDeepSICTrainer(DeepSICTrainer):
         self.detector = [[DeepSICDetector().to(DEVICE) for _ in range(self.iterations)] for _ in
                          range(conf.n_user)]  # 2D list for Storing the DeepSIC Networks
 
-    def soft_symbols_from_probs(self, i, input, user):
+    def soft_symbols_from_probs(self, i, input, user, snrs_list=None):
         output = self.softmax(self.detector[user][i - 1](input.float()))
         return output
 

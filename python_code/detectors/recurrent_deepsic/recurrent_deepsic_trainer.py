@@ -22,9 +22,13 @@ class RecDeepSICTrainer(DeepSICTrainer):
         for _ in range(conf.n_user):
             self.detector.append(DeepSICDetector())
 
-    def soft_symbols_from_probs(self, i, input, user):
+    def soft_symbols_from_probs(self, i, input, user, snrs_list=None):
         output = self.softmax(self.detector[user](input.float()))
         return output
+
+    def joint_training(self, message_words, received_words, snrs_list):
+        for tx, rx in zip(message_words, received_words):
+            self._online_training(tx, rx)
 
     def train_model(self, single_model: nn.Module, mx: torch.Tensor, rx: torch.Tensor):
         """

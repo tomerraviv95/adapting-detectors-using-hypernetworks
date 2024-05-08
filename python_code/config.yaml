@@ -5,9 +5,9 @@ seed: 5 # run seed
 block_length: 6000 # coherence block time, total size of pilot + data. values: int.
 pilots_length: 1000 # pilot bits
 blocks_num: 200 # number of validation frames. values: int.
-n_user: 4 # number of transmitting devices
+n_user: 5 # number of transmitting devices
 n_ant: 12 # number of received signals
 
 # training hyperparameters
-detector_type: 'online_hyper_deepsic' # ['seq_deepsic','rec_deepsic','online_hyper_deepsic']
+detector_type: 'seq_deepsic' # ['seq_deepsic','rec_deepsic','online_hyper_deepsic']
 hidden_base_size: 24 # size of the hidden layer in DeepSIC
