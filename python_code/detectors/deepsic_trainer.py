@@ -1,10 +1,12 @@
+from typing import List
+
 import torch
 
 from python_code import DEVICE, conf
 from python_code.datasets.communications_blocks.modulator import BPSKModulator
 from python_code.detectors.detector_trainer import Detector
 
-EPOCHS = 500
+EPOCHS = 50
 
 
 class DeepSICTrainer(Detector):
@@ -26,12 +28,12 @@ class DeepSICTrainer(Detector):
         """
         return self.criterion(input=est, target=mx.long())
 
-    def forward(self, rx: torch.Tensor, h: torch.Tensor = None) -> torch.Tensor:
+    def forward(self, rx: torch.Tensor, snrs_list: List[List[float]] = None) -> torch.Tensor:
         with torch.no_grad():
             # detect and decode
             probs_vec = 0.5 * torch.ones([rx.shape[0], conf.n_user]).to(DEVICE).float()
             for i in range(self.iterations):
-                probs_vec = self.calculate_posteriors(i + 1, probs_vec, rx)
+                probs_vec = self.calculate_posteriors(i + 1, probs_vec, rx, snrs_list)
             detected_words = self.symbols_from_prob(probs_vec)
             return detected_words
 
@@ -54,7 +56,7 @@ class DeepSICTrainer(Detector):
             rx_all.append(current_y_train)
         return tx_all, rx_all
 
-    def calculate_posteriors(self, i: int, probs_vec: torch.Tensor, rx: torch.Tensor) -> torch.Tensor:
+    def calculate_posteriors(self, i: int, probs_vec: torch.Tensor, rx: torch.Tensor, snrs_list=None) -> torch.Tensor:
         """
         Propagates the probabilities through the learnt networks for a single iteration.
         """
@@ -63,6 +65,6 @@ class DeepSICTrainer(Detector):
             idx = [user_i for user_i in range(conf.n_user) if user_i != user]
             input = torch.cat((rx, probs_vec[:, idx].reshape(rx.shape[0], -1)), dim=1)
             with torch.no_grad():
-                output = self.soft_symbols_from_probs(i, input, user)
+                output = self.soft_symbols_from_probs(i, input, user, snrs_list)
             next_probs_vec[:, user] = output[:, 1:].reshape(next_probs_vec[:, user].shape)
         return next_probs_vec
