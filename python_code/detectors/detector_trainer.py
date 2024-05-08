@@ -42,24 +42,6 @@ class Detector(nn.Module):
         """
         pass
 
-    # setup the optimization algorithm
-    def deep_learning_setup(self, lr: float):
-        """
-        Sets up the optimizer and loss criterion
-        """
-        self.optimizer = Adam(filter(lambda p: p.requires_grad, self.detector.parameters()),
-                              lr=lr)
-        self.criterion = CrossEntropyLoss().to(DEVICE)
-
-    # setup the optimization algorithm
-    def calibration_deep_learning_setup(self):
-        """
-        Sets up the optimizer and loss criterion
-        """
-        self.optimizer = Adam(filter(lambda p: p.requires_grad, self.detector.net.dropout_logits),
-                              lr=self.lr)
-        self.criterion = CrossEntropyLoss().to(DEVICE)
-
     def _online_training(self, tx: torch.Tensor, rx: torch.Tensor):
         """
         Every detector evaluater must have some function to adapt it online

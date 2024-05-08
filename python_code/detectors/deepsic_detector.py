@@ -20,8 +20,7 @@ class DeepSICDetector(nn.Module):
         super(DeepSICDetector, self).__init__()
         classes_num = 2
         hidden_size = conf.hidden_base_size * classes_num
-        base_rx_size = conf.n_ant
-        linear_input = base_rx_size + (classes_num - 1) * (conf.n_user - 1)  # from DeepSIC paper
+        linear_input = conf.n_ant + (classes_num - 1) * (conf.n_user - 1)  # from DeepSIC paper
         self.activation = nn.ReLU()
         self.fc1 = nn.Linear(linear_input, hidden_size)
         self.fc2 = nn.Linear(hidden_size, classes_num)
