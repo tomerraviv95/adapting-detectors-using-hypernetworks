@@ -41,6 +41,16 @@ class Detector(nn.Module):
         """
         pass
 
+    def _run_train_loop(self, est: torch.Tensor, mx: torch.Tensor) -> float:
+        # calculate loss
+        loss = self._calc_loss(est=est, mx=mx)
+        current_loss = loss.item()
+        # back propagation
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+        return current_loss
+
     def train(self, mx: torch.Tensor, rx: torch.Tensor, snrs_list=None):
         """
         Every detector evaluater must have some function to adapt it online
@@ -52,13 +62,3 @@ class Detector(nn.Module):
         Every evaluater must have some forward pass for its detector
         """
         pass
-
-    def _run_train_loop(self, est: torch.Tensor, mx: torch.Tensor) -> float:
-        # calculate loss
-        loss = self._calc_loss(est=est, mx=mx)
-        current_loss = loss.item()
-        # back propagation
-        self.optimizer.zero_grad()
-        loss.backward()
-        self.optimizer.step()
-        return current_loss

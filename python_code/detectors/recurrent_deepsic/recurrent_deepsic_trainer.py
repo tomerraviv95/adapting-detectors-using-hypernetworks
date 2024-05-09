@@ -51,6 +51,6 @@ class RecDeepSICTrainer(DeepSICTrainer):
         # Initializing the probabilities
         probs_vec = 0.5 * torch.ones(mx.shape).to(DEVICE)
         # Obtaining the DeepSIC networks for each user-symbol and the i-th iteration
-        mx_all, rx_all = self.prepare_data_for_training(mx, rx, probs_vec)
+        mx_all, rx_all = self._prepare_data_for_training(mx, rx, probs_vec)
         # Training the DeepSIC networks for the iteration>1
         self.train_models(self.detector, mx_all, rx_all)
