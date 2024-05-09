@@ -4,11 +4,11 @@ import torch
 
 from python_code import DEVICE, conf
 from python_code.detectors.deepsic_detector import DeepSICDetector
-from python_code.detectors.deepsic_trainer import DeepSICTrainer, EPOCHS
+from python_code.detectors.deepsic_trainer import DeepSICTrainer
 from python_code.detectors.hypernetwork_deepsic.hyper_deepsic import HyperDeepSICDetector
 from python_code.detectors.hypernetwork_deepsic.hypernetwork import Hypernetwork
 from python_code.detectors.hypernetwork_deepsic.user_embedder import UserEmbedder, USER_EMB_SIZE
-from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType
+from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType, EPOCHS_DICT
 
 
 class HypernetworkDeepSICTrainer(DeepSICTrainer):
@@ -19,17 +19,17 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
             raise ValueError("Online training is not implemented for this detector!!!")
 
     def __str__(self):
-        return TRAINING_TYPES_DICT[conf.training_type] + ' Hypernetwork-based DeepSIC'
+        return TRAINING_TYPES_DICT[conf.training_type].name + ' Hypernetwork-based DeepSIC'
 
     def _initialize_detector(self):
         self.user_embedder = UserEmbedder().to(DEVICE)
-        self.base_deepsic = DeepSICDetector()
+        self.base_deepsic = DeepSICDetector(self.hidden_size)
         total_parameters = [param.numel() for param in self.base_deepsic.parameters()]
         self.hypernetworks = [Hypernetwork(USER_EMB_SIZE, total_parameters).to(DEVICE) for _ in range(conf.n_user)]
         self.hyper_deepsic = HyperDeepSICDetector([param.size() for param in self.base_deepsic.parameters()])
         self.inference_weights = [None for _ in range(conf.n_user)]
 
-    def _soft_symbols_from_probs(self, i: int, input: torch.Tensor, user: int, snrs_list: list[float]) -> torch.Tensor:
+    def _soft_symbols_from_probs(self, input: torch.Tensor, user: int, i: int, snrs_list: List[float]) -> torch.Tensor:
         if i == 1:
             context_embedding = self._get_context_embedding(snrs_list, user)
             self.inference_weights[user] = self.hypernetworks[user](context_embedding)
@@ -41,7 +41,8 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         self.optimizer = torch.optim.Adam(self.hypernetworks[user].parameters(), lr=self.lr)
         self.criterion = torch.nn.CrossEntropyLoss()
         # iterate over the channels
-        for _ in range(EPOCHS):
+        epochs = EPOCHS_DICT[conf.training_type]
+        for _ in range(epochs):
             loss = 0
             for i in range(len(snrs_list)):
                 mx, rx, snrs = message_words[i], received_words[i], snrs_list[i]
@@ -63,7 +64,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
 
     def _get_context_embedding(self, snrs: List[float], user: int) -> torch.Tensor:
         user_embeddings = self.user_embedder(torch.Tensor(snrs).to(DEVICE).reshape(-1, 1))
-        context_embedding = torch.Tensor(0).to(DEVICE)
+        context_embedding = torch.zeros_like(user_embeddings[0]).to(DEVICE)
         for j in range(conf.n_user):
             context_embedding += (-1) ** (j != user) * user_embeddings[j]
         return context_embedding

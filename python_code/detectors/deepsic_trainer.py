@@ -5,8 +5,7 @@ import torch
 from python_code import DEVICE, conf
 from python_code.datasets.communications_blocks.modulator import BPSKModulator
 from python_code.detectors.detector_trainer import Detector
-
-EPOCHS = 20
+from python_code.utils.constants import HIDDEN_SIZES_DICT, TRAINING_TYPES_DICT
 
 
 class DeepSICTrainer(Detector):
@@ -14,6 +13,7 @@ class DeepSICTrainer(Detector):
     def __init__(self):
         self.lr = 5e-3
         self.iterations = 3
+        self.hidden_size = HIDDEN_SIZES_DICT[TRAINING_TYPES_DICT[conf.training_type]]
         super().__init__()
 
     def __str__(self):
@@ -56,7 +56,7 @@ class DeepSICTrainer(Detector):
             idx = [user_i for user_i in range(conf.n_user) if user_i != user]
             input = torch.cat((rx, probs_vec[:, idx].reshape(rx.shape[0], -1)), dim=1)
             with torch.no_grad():
-                output = self.soft_symbols_from_probs(i, input, user, snrs_list)
+                output = self._soft_symbols_from_probs(input, user, i, snrs_list)
             next_probs_vec[:, user] = output[:, 1:].reshape(next_probs_vec[:, user].shape)
         return next_probs_vec
 

@@ -18,3 +18,5 @@ class TrainingType(Enum):
 
 
 TRAINING_TYPES_DICT = {'joint': TrainingType.joint, 'online': TrainingType.online}
+EPOCHS_DICT = {'joint': 50, 'online': 25}
+HIDDEN_SIZES_DICT = {TrainingType.joint: 64, TrainingType.online: 16}

@@ -16,10 +16,9 @@ class DeepSICDetector(nn.Module):
     ================================
     """
 
-    def __init__(self):
+    def __init__(self, hidden_size: int):
         super(DeepSICDetector, self).__init__()
         classes_num = 2
-        hidden_size = conf.hidden_base_size * classes_num
         linear_input = conf.n_ant + (classes_num - 1) * (conf.n_user - 1)  # from DeepSIC paper
         self.activation = nn.ReLU()
         self.fc1 = nn.Linear(linear_input, hidden_size)
