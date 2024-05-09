@@ -70,12 +70,9 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
 
     def _get_context_embedding(self, snrs: List[float], user: int) -> torch.Tensor:
         user_embeddings = self.user_embedder(10 ** (torch.Tensor(snrs).to(DEVICE).reshape(-1, 1) / 20))
-        user_embeddings = self.user_embedder(torch.Tensor(snrs).to(DEVICE).reshape(-1, 1))
         context_embedding = torch.zeros_like(user_embeddings[0]).to(DEVICE)
         for j in range(conf.n_user):
             context_embedding += (-1) ** (j != user) * user_embeddings[j]
-        # noise_embedding = self.user_embedder(torch.Tensor([1]).to(DEVICE))
-        # context_embedding -= noise_embedding
         return context_embedding
 
     def train(self, mx: torch.Tensor, rx: torch.Tensor, snrs_list: List[List[float]]):
