@@ -3,7 +3,7 @@ from typing import List
 import torch
 from torch import nn
 
-USER_EMB_SIZE = 8
+USER_EMB_SIZE = 16
 
 
 class UserEmbedder(nn.Module):
