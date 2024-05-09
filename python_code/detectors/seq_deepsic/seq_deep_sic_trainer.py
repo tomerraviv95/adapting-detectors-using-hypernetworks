@@ -6,6 +6,7 @@ from torch import nn
 from python_code import DEVICE, conf
 from python_code.detectors.deepsic_detector import DeepSICDetector
 from python_code.detectors.deepsic_trainer import DeepSICTrainer, EPOCHS
+from python_code.utils.constants import TRAINING_TYPES_DICT
 
 
 class SeqDeepSICTrainer(DeepSICTrainer):
@@ -14,15 +15,14 @@ class SeqDeepSICTrainer(DeepSICTrainer):
         super().__init__()
 
     def __str__(self):
-        return 'Sequential DeepSIC'
+        return TRAINING_TYPES_DICT[conf.training_type] + ' Sequential DeepSIC'
 
     def _initialize_detector(self):
         self.detector = [[DeepSICDetector().to(DEVICE) for _ in range(self.iterations)] for _ in
                          range(conf.n_user)]  # 2D list for Storing the DeepSIC Networks
 
     def soft_symbols_from_probs(self, i, input, user, snrs_list=None):
-        output = self.softmax(self.detector[user][i - 1](input.float()))
-        return output
+        return self.softmax(self.detector[user][i - 1](input.float()))
 
     def train_model(self, single_model: nn.Module, mx: torch.Tensor, rx: torch.Tensor):
         """

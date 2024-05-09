@@ -9,5 +9,6 @@ n_user: 5 # number of transmitting devices
 n_ant: 12 # number of received signals
 
 # training hyperparameters
-detector_type: 'seq_deepsic' # ['seq_deepsic','rec_deepsic','online_hyper_deepsic']
+detector_type: 'seq_deepsic' # ['seq_deepsic','rec_deepsic','hyper_deepsic']
+training_type: 'joint' # ['joint','online']
 hidden_base_size: 24 # size of the hidden layer in DeepSIC

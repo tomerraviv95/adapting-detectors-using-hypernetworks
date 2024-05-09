@@ -1,103 +1,73 @@
 from typing import List
 
 import torch
-from torch import nn
 
 from python_code import DEVICE, conf
 from python_code.detectors.deepsic_detector import DeepSICDetector
 from python_code.detectors.deepsic_trainer import DeepSICTrainer, EPOCHS
 from python_code.detectors.hypernetwork_deepsic.hyper_deepsic import HyperDeepSICDetector
 from python_code.detectors.hypernetwork_deepsic.hypernetwork import Hypernetwork
-from python_code.detectors.hypernetwork_deepsic.snr_embedder import UserEmbedder
+from python_code.detectors.hypernetwork_deepsic.user_embedder import UserEmbedder, USER_EMB_SIZE
+from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType
 
 
-class OnlineHypernetworkDeepSICTrainer(DeepSICTrainer):
+class HypernetworkDeepSICTrainer(DeepSICTrainer):
 
     def __init__(self):
         super().__init__()
+        if TRAINING_TYPES_DICT[conf.training_type] == TrainingType.online:
+            raise ValueError("Online training is not implemented for this detector!!!")
 
     def __str__(self):
-        return 'Online Hypernetwork-based DeepSIC'
+        return TRAINING_TYPES_DICT[conf.training_type] + ' Hypernetwork-based DeepSIC'
 
     def _initialize_detector(self):
+        self.user_embedder = UserEmbedder().to(DEVICE)
         self.base_deepsic = DeepSICDetector()
         total_parameters = [param.numel() for param in self.base_deepsic.parameters()]
-        self.hypernetworks = [Hypernetwork(32, total_parameters).to(DEVICE) for _ in range(conf.n_user)]
+        self.hypernetworks = [Hypernetwork(USER_EMB_SIZE, total_parameters).to(DEVICE) for _ in range(conf.n_user)]
         self.hyper_deepsic = HyperDeepSICDetector([param.size() for param in self.base_deepsic.parameters()])
         self.inference_weights = [None for _ in range(conf.n_user)]
-        self.user_embedder = UserEmbedder(32).to(DEVICE)
 
-    def soft_symbols_from_probs(self, i, input, user, snrs_list):
+    def _soft_symbols_from_probs(self, i: int, input: torch.Tensor, user: int, snrs_list: list[float]) -> torch.Tensor:
         if i == 1:
-            user_embedding = self.user_embedder(torch.Tensor(snrs_list).to(DEVICE).reshape(-1, 1))
-            context_embedding = 0
-            for j in range(conf.n_user):
-                context_embedding += (-1) ** (j != user) * user_embedding[j]
+            context_embedding = self._get_context_embedding(snrs_list, user)
             self.inference_weights[user] = self.hypernetworks[user](context_embedding)
         deepsic_output = self.hyper_deepsic(input.float(), self.inference_weights[user])
         return self.softmax(deepsic_output)
 
-    def train_model(self, hypernetwork: nn.Module, mx: torch.Tensor, rx: torch.Tensor, snrs_list, k):
-        """
-        Trains a hypernetwork DeepSIC Network
-        """
-        self.optimizer = torch.optim.Adam(hypernetwork.parameters(), lr=self.lr)
+    def _train_single_hypernetwork(self, message_words: torch.Tensor, received_words: torch.Tensor,
+                                   snrs_list: List[float], user: int):
+        self.optimizer = torch.optim.Adam(self.hypernetworks[user].parameters(), lr=self.lr)
         self.criterion = torch.nn.CrossEntropyLoss()
-        for epoch in range(EPOCHS):
-            user_embedding = self.user_embedder(torch.Tensor(snrs_list).to(DEVICE).reshape(-1, 1))
-            context_embedding = 0
-            for j in range(conf.n_user):
-                context_embedding += (-1) ** (j != k) * user_embedding[j]
-            # Forward pass through the hypernetwork to generate weights
-            weights = hypernetwork(context_embedding)
-            # Set the generated weights to the base network in the forward pass of deepsic
-            soft_estimation = self.hyper_deepsic(rx.float(), weights)
-            # calculate loss and update parameters of hypernetwork
-            loss = self.run_train_loop(soft_estimation, mx)
+        # iterate over the channels
+        for _ in range(EPOCHS):
+            loss = 0
+            for i in range(len(snrs_list)):
+                mx, rx, snrs = message_words[i], received_words[i], snrs_list[i]
+                # Obtaining the DeepSIC networks for each user-symbol and the i-th iteration
+                probs_vec = 0.5 * torch.ones(mx.shape).to(DEVICE)
+                mx_all, rx_all = self.prepare_data_for_training(mx, rx, probs_vec)
+                # get the context embedding for the hypernetwork based on the user and snrs
+                context_embedding = self._get_context_embedding(snrs, user)
+                # Forward pass through the hypernetwork to generate weights
+                weights = self.hypernetworks[user](context_embedding)
+                # Set the generated weights to the base network in the forward pass of deepsic
+                soft_estimation = self.hyper_deepsic(rx_all[user].float(), weights)
+                # calculate loss
+                loss += self.calc_loss(est=soft_estimation, mx=mx_all[user])
+            # back propagation
+            self.optimizer.zero_grad()
+            loss.backward()
+            self.optimizer.step()
 
-    def joint_training(self, message_words, received_words, snrs_list):
+    def _get_context_embedding(self, snrs: List[float], user: int) -> torch.Tensor:
+        user_embeddings = self.user_embedder(torch.Tensor(snrs).to(DEVICE).reshape(-1, 1))
+        context_embedding = torch.Tensor(0).to(DEVICE)
+        for j in range(conf.n_user):
+            context_embedding += (-1) ** (j != user) * user_embeddings[j]
+        return context_embedding
+
+    def joint_training(self, message_words: torch.Tensor, received_words: torch.Tensor, snrs_list: List[float]):
         for user in range(conf.n_user):
-            self.optimizer = torch.optim.Adam(self.hypernetworks[user].parameters(), lr=self.lr)
-            self.criterion = torch.nn.CrossEntropyLoss()
-            # iterate over the channels
-            for _ in range(EPOCHS):
-                loss = 0
-                for i in range(len(snrs_list)):
-                    mx, rx, snrs = message_words[i], received_words[i], snrs_list[i]
-                    # Obtaining the DeepSIC networks for each user-symbol and the i-th iteration
-                    probs_vec = 0.5 * torch.ones(mx.shape).to(DEVICE)
-                    mx_all, rx_all = self.prepare_data_for_training(mx, rx, probs_vec)
-                    user_embeddings = self.user_embedder(torch.Tensor(snrs).to(DEVICE).reshape(-1, 1))
-                    context_embedding = 0
-                    for j in range(conf.n_user):
-                        context_embedding += (-1) ** (j != user) * user_embeddings[j]
-                    # Forward pass through the hypernetwork to generate weights
-                    weights = self.hypernetworks[user](context_embedding)
-                    # Set the generated weights to the base network in the forward pass of deepsic
-                    soft_estimation = self.hyper_deepsic(rx_all[user].float(), weights)
-                    # calculate loss
-                    loss += self.calc_loss(est=soft_estimation, mx=mx_all[user])
-                # back propagation
-                self.optimizer.zero_grad()
-                loss.backward()
-                self.optimizer.step()
-            print(loss, torch.sum(torch.argmax(soft_estimation, dim=1) == mx[:, user]))
-
-    def _online_training(self, mx: torch.Tensor, rx: torch.Tensor, snrs_list: List[List[float]]):
-        """
-        Main training function for DeepSIC evaluater. Initializes the probabilities, then propagates them through the
-        network, training sequentially each network and not by end-to-end manner (each one individually).
-        """
-        if self.train_from_scratch:
-            self._initialize_detector()
-        # Initializing the probabilities
-        probs_vec = 0.5 * torch.ones(mx.shape).to(DEVICE)
-        # Training the DeepSICNet for each user-symbol/iteration
-        for i in range(self.iterations):
-            # Obtaining the DeepSIC networks for each user-symbol and the i-th iteration
-            mx_all, rx_all = self.prepare_data_for_training(mx, rx, probs_vec)
-            # Training the DeepSIC networks for the iteration>1
-            for k in range(conf.n_user):
-                self.train_model(self.hypernetwork, mx_all[k], rx_all[k], snrs_list, k)
-            # Generating soft symbols for training purposes
-            probs_vec = self.calculate_posteriors(i + 1, probs_vec, rx, snrs_list)
+            self._train_single_hypernetwork(message_words, received_words, snrs_list, user)

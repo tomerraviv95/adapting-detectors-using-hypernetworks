@@ -6,6 +6,7 @@ from torch import nn
 from python_code import DEVICE, conf
 from python_code.detectors.deepsic_detector import DeepSICDetector
 from python_code.detectors.deepsic_trainer import DeepSICTrainer, EPOCHS
+from python_code.utils.constants import TRAINING_TYPES_DICT
 
 
 class RecDeepSICTrainer(DeepSICTrainer):
@@ -14,21 +15,14 @@ class RecDeepSICTrainer(DeepSICTrainer):
         super().__init__()
 
     def __str__(self):
-        return 'Recurrent DeepSIC'
+        return TRAINING_TYPES_DICT[conf.training_type] + ' Recurrent DeepSIC'
 
     def _initialize_detector(self):
         # populate 1D list for Storing the DeepSIC Networks
-        self.detector = []
-        for _ in range(conf.n_user):
-            self.detector.append(DeepSICDetector())
+        self.detector = [DeepSICDetector() for _ in range(conf.n_user)]
 
-    def soft_symbols_from_probs(self, i, input, user, snrs_list=None):
-        output = self.softmax(self.detector[user](input.float()))
-        return output
-
-    def joint_training(self, message_words, received_words, snrs_list):
-        for tx, rx in zip(message_words, received_words):
-            self._online_training(tx, rx)
+    def soft_symbols_from_probs(self, input: int, user: int, i=None, snrs_list=None) -> torch.Tensor:
+        return self.softmax(self.detector[user](input.float()))
 
     def train_model(self, single_model: nn.Module, mx: torch.Tensor, rx: torch.Tensor):
         """
@@ -58,5 +52,15 @@ class RecDeepSICTrainer(DeepSICTrainer):
         probs_vec = 0.5 * torch.ones(tx.shape).to(DEVICE)
         # Obtaining the DeepSIC networks for each user-symbol and the i-th iteration
         tx_all, rx_all = self.prepare_data_for_training(tx, rx, probs_vec)
+        # Training the DeepSIC networks for the iteration>1
+        self.train_models(self.detector, tx_all, rx_all)
+
+    def joint_training(self, mx: torch.Tensor, rx: torch.Tensor, snrs_list=None):
+        mx = mx.reshape(-1, mx.shape[2])
+        rx = rx.reshape(-1, rx.shape[2])
+        # Initializing the probabilities
+        probs_vec = 0.5 * torch.ones(mx.shape).to(DEVICE)
+        # Obtaining the DeepSIC networks for each user-symbol and the i-th iteration
+        tx_all, rx_all = self.prepare_data_for_training(mx, rx, probs_vec)
         # Training the DeepSIC networks for the iteration>1
         self.train_models(self.detector, tx_all, rx_all)

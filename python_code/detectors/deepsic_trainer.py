@@ -14,6 +14,8 @@ class DeepSICTrainer(Detector):
     def __init__(self):
         self.lr = 5e-3
         self.iterations = 3
+        self.joint = False
+        self.online = False
         super().__init__()
 
     def __str__(self):

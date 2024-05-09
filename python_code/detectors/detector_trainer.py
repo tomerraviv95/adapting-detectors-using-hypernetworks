@@ -4,10 +4,9 @@ from typing import Tuple
 import numpy as np
 import torch
 from torch import nn
-from torch.nn import CrossEntropyLoss
-from torch.optim import Adam
 
-from python_code import DEVICE, conf
+from python_code import conf
+from python_code.utils.constants import TRAINING_TYPES_DICT
 
 random.seed(conf.seed)
 torch.manual_seed(conf.seed)
@@ -22,9 +21,9 @@ class Detector(nn.Module):
 
     def __init__(self):
         super().__init__()
-        self.train_from_scratch = False
         self._initialize_detector()
         self.softmax = torch.nn.Softmax(dim=1)
+        self.training_type = TRAINING_TYPES_DICT[conf.training_type]
 
     def get_name(self):
         return self.__name__()
