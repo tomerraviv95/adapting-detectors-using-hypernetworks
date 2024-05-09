@@ -45,7 +45,7 @@ class Evaluator(object):
         message_words, received_words, snrs_list = self.train_channel_dataset.__getitem__(phase=Phase.TRAIN)
         TRAIN = False
         if TRAIN:
-            self.detector.joint_training(message_words, received_words, snrs_list)
+            self.detector.train(message_words, received_words, snrs_list)
         message_words, received_words, snrs_list = self.test_channel_dataset.__getitem__(phase=Phase.TEST)
         # detect sequentially
         for block_ind in range(conf.blocks_num):
@@ -56,7 +56,7 @@ class Evaluator(object):
             mx_pilot, rx_pilot = mx[:conf.pilots_length], rx[:conf.pilots_length]
             mx_data, rx_data = mx[conf.pilots_length:], rx[conf.pilots_length:]
             # run online training on the pilots part
-            self.detector._online_training(mx_pilot, rx_pilot)
+            self.detector.train(mx_pilot, rx_pilot)
             # detect data part after training on the pilot part
             detected_words = self.detector.forward(rx_data, snrs_list[block_ind])
             ser = calculate_error_rate(detected_words, mx_data)

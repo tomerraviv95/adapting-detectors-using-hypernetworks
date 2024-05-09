@@ -55,7 +55,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
                 # Set the generated weights to the base network in the forward pass of deepsic
                 soft_estimation = self.hyper_deepsic(rx_all[user].float(), weights)
                 # calculate loss
-                loss += self.calc_loss(est=soft_estimation, mx=mx_all[user])
+                loss += self._calc_loss(est=soft_estimation, mx=mx_all[user])
             # back propagation
             self.optimizer.zero_grad()
             loss.backward()
@@ -68,6 +68,6 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
             context_embedding += (-1) ** (j != user) * user_embeddings[j]
         return context_embedding
 
-    def joint_training(self, message_words: torch.Tensor, received_words: torch.Tensor, snrs_list: List[float]):
+    def train(self, mx: torch.Tensor, rx: torch.Tensor, snrs_list: List[float]):
         for user in range(conf.n_user):
-            self._train_single_hypernetwork(message_words, received_words, snrs_list, user)
+            self._train_single_hypernetwork(mx, rx, snrs_list, user)

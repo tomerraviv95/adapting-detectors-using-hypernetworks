@@ -14,8 +14,6 @@ class DeepSICTrainer(Detector):
     def __init__(self):
         self.lr = 5e-3
         self.iterations = 3
-        self.joint = False
-        self.online = False
         super().__init__()
 
     def __str__(self):
@@ -24,7 +22,7 @@ class DeepSICTrainer(Detector):
     def _initialize_detector(self):
         pass
 
-    def calc_loss(self, est: torch.Tensor, mx: torch.IntTensor) -> torch.Tensor:
+    def _calc_loss(self, est: torch.Tensor, mx: torch.IntTensor) -> torch.Tensor:
         """
         Cross Entropy loss - distribution over states versus the gt state label
         """
@@ -44,19 +42,19 @@ class DeepSICTrainer(Detector):
         detected_words = BPSKModulator.demodulate(symbols_word)
         return detected_words
 
-    def prepare_data_for_training(self, tx: torch.Tensor, rx: torch.Tensor, probs_vec: torch.Tensor) -> [
+    def prepare_data_for_training(self, mx: torch.Tensor, rx: torch.Tensor, probs_vec: torch.Tensor) -> [
         torch.Tensor, torch.Tensor]:
         """
         Generates the data for each user
         """
-        tx_all = []
+        mx_all = []
         rx_all = []
         for k in range(conf.n_user):
             idx = [user_i for user_i in range(conf.n_user) if user_i != k]
             current_y_train = torch.cat((rx, probs_vec[:, idx].reshape(rx.shape[0], -1)), dim=1)
-            tx_all.append(tx[:, k])
+            mx_all.append(mx[:, k])
             rx_all.append(current_y_train)
-        return tx_all, rx_all
+        return mx_all, rx_all
 
     def calculate_posteriors(self, i: int, probs_vec: torch.Tensor, rx: torch.Tensor, snrs_list=None) -> torch.Tensor:
         """

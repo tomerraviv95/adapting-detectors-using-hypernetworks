@@ -35,13 +35,13 @@ class Detector(nn.Module):
         self.detector = None
 
     # calculate train loss
-    def calc_loss(self, est: torch.Tensor, mx: torch.Tensor) -> torch.Tensor:
+    def _calc_loss(self, est: torch.Tensor, mx: torch.Tensor) -> torch.Tensor:
         """
          Every evaluater must have some loss calculation
         """
         pass
 
-    def _online_training(self, tx: torch.Tensor, rx: torch.Tensor):
+    def train(self, mx: torch.Tensor, rx: torch.Tensor, snrs_list=None):
         """
         Every detector evaluater must have some function to adapt it online
         """
@@ -53,9 +53,9 @@ class Detector(nn.Module):
         """
         pass
 
-    def run_train_loop(self, est: torch.Tensor, mx: torch.Tensor) -> float:
+    def _run_train_loop(self, est: torch.Tensor, mx: torch.Tensor) -> float:
         # calculate loss
-        loss = self.calc_loss(est=est, mx=mx)
+        loss = self._calc_loss(est=est, mx=mx)
         current_loss = loss.item()
         # back propagation
         self.optimizer.zero_grad()
