@@ -4,13 +4,14 @@ from python_code import conf
 from python_code.utils.constants import Phase
 
 # per user: (Min SNR, Max SNR, Number of blocks between peaks)
-TRAIN_SNR_PER_USER = [(1, 10, 10), (1, 10, 10), (1, 10, 10), (1, 10, 10),
-                      (1, 10, 10), (1, 10, 10), (1, 10, 10), (1, 10, 10),
+TRAIN_SNR_PER_USER = [(1, 20, 1), (1, 40, 2), (0.5, 10, 3), (1.5, 20, 5),
+                      (1, 10, 1), (1, 10, 1), (1, 10, 1), (1, 10, 1),
                       (1, 10, 10), (1, 10, 10), (1, 10, 10), (1, 10, 10)]
 
-TEST_SNR_PER_USER = [(-5, 20, 20), (-5, 20, 15), (-5, 20, 10), (-5, 20, 5),
-                     (1, 10, 10), (1, 10, 10), (1, 10, 10), (1, 10, 10),
+TEST_SNR_PER_USER = [(1, 10, 1), (1, 10, 1), (1, 10, 1), (1, 10, 1),
+                     (5, 9, 3), (2, 26, 90), (-1, 10, 12), (3, 16, 20),
                      (1, 10, 10), (1, 10, 10), (1, 10, 10), (1, 10, 10)]
+
 SNR_PER_USER_DICT = {Phase.TRAIN: TRAIN_SNR_PER_USER, Phase.TEST: TEST_SNR_PER_USER}
 
 
@@ -51,7 +52,7 @@ class SEDChannel:
         :param h: channel matrix function
         :return: received word y
         """
-        snrs = (10 ** (snrs / 20))
+        snrs = 10 ** (snrs / 20)
         snrs_mat = np.eye(conf.n_user)
         for i in range(conf.n_user):
             snrs_mat[i, i] = snrs[i]

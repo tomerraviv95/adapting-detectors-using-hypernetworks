@@ -18,20 +18,21 @@ class ChannelModelDataset(Dataset):
     Returns (transmitted, received, channel_coefficients) batch.
     """
 
-    def __init__(self):
-        self.blocks_num = conf.blocks_num
-        self.generator = Generator()
+    def __init__(self, block_length: int, blocks_num: int, pilots_length: int):
+        self.block_length = block_length
+        self.blocks_num = blocks_num
+        self.generator = Generator(block_length, pilots_length)
         self.modulator = BPSKModulator()
         self.transmitter = Transmitter()
 
     def get_data(self, phase, database: list):
         if database is None:
             database = []
-        mx_full = np.empty((self.blocks_num, conf.block_length, conf.n_user))
-        rx_full = np.empty((self.blocks_num, conf.block_length, conf.n_ant))
+        mx_full = np.empty((self.blocks_num, self.block_length, conf.n_user))
+        rx_full = np.empty((self.blocks_num, self.block_length, conf.n_ant))
         snrs_list = []
         # accumulate words until reaches desired number
-        for index in range(conf.blocks_num):
+        for index in range(self.blocks_num):
             mx = self.generator.generate()
             tx = self.modulator.modulate(mx)
             rx, snrs = self.transmitter.transmit(tx, index, phase)

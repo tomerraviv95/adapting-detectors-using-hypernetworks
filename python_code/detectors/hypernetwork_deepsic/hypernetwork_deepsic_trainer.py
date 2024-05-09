@@ -1,3 +1,4 @@
+from itertools import chain
 from typing import List
 
 import torch
@@ -15,6 +16,8 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
 
     def __init__(self):
         super().__init__()
+        self.train_context_embedding = []
+        self.test_context_embedding = []
         if TRAINING_TYPES_DICT[conf.training_type] == TrainingType.online:
             raise ValueError("Online training is not implemented for this detector!!!")
 
@@ -32,13 +35,15 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
     def _soft_symbols_from_probs(self, input: torch.Tensor, user: int, i: int, snrs_list: List[float]) -> torch.Tensor:
         if i == 1:
             context_embedding = self._get_context_embedding(snrs_list, user)
+            self.test_context_embedding.append(context_embedding.cpu().numpy())
             self.inference_weights[user] = self.hypernetworks[user](context_embedding)
         deepsic_output = self.hyper_deepsic(input.float(), self.inference_weights[user])
         return self.softmax(deepsic_output)
 
     def _train_single_hypernetwork(self, message_words: torch.Tensor, received_words: torch.Tensor,
-                                   snrs_list: List[float], user: int):
-        self.optimizer = torch.optim.Adam(self.hypernetworks[user].parameters(), lr=self.lr)
+                                   snrs_list: List[List[float]], user: int):
+        total_parameters = chain(self.hypernetworks[user].parameters(), self.user_embedder.parameters())
+        self.optimizer = torch.optim.Adam(total_parameters, lr=self.lr)
         self.criterion = torch.nn.CrossEntropyLoss()
         # iterate over the channels
         epochs = EPOCHS_DICT[conf.training_type]
@@ -51,6 +56,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
                 mx_all, rx_all = self._prepare_data_for_training(mx, rx, probs_vec)
                 # get the context embedding for the hypernetwork based on the user and snrs
                 context_embedding = self._get_context_embedding(snrs, user)
+                self.train_context_embedding.append(context_embedding.detach().cpu().numpy())
                 # Forward pass through the hypernetwork to generate weights
                 weights = self.hypernetworks[user](context_embedding)
                 # Set the generated weights to the base network in the forward pass of deepsic
@@ -63,12 +69,15 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
             self.optimizer.step()
 
     def _get_context_embedding(self, snrs: List[float], user: int) -> torch.Tensor:
+        user_embeddings = self.user_embedder(10 ** (torch.Tensor(snrs).to(DEVICE).reshape(-1, 1) / 20))
         user_embeddings = self.user_embedder(torch.Tensor(snrs).to(DEVICE).reshape(-1, 1))
         context_embedding = torch.zeros_like(user_embeddings[0]).to(DEVICE)
         for j in range(conf.n_user):
             context_embedding += (-1) ** (j != user) * user_embeddings[j]
+        # noise_embedding = self.user_embedder(torch.Tensor([1]).to(DEVICE))
+        # context_embedding -= noise_embedding
         return context_embedding
 
-    def train(self, mx: torch.Tensor, rx: torch.Tensor, snrs_list: List[float]):
+    def train(self, mx: torch.Tensor, rx: torch.Tensor, snrs_list: List[List[float]]):
         for user in range(conf.n_user):
             self._train_single_hypernetwork(mx, rx, snrs_list, user)
