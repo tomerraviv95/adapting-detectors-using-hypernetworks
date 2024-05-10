@@ -37,7 +37,7 @@ class Evaluator(object):
 
     def evaluate(self) -> MetricOutput:
         """
-        The online evaluation run.
+        The Online evaluation run.
         Main function for running the experiments of sequential transmission of pilots and
         data for the paper.
         :return: list of ber per timestep
@@ -46,9 +46,9 @@ class Evaluator(object):
         torch.cuda.empty_cache()
         ser_list, ber_list, ece_list = [], [], []
         # ---------------------------------------------------------
-        # joint training - as in the config "training_type" option
+        # Joint training - as in the config "training_type" option
         message_words, received_words, snrs_list = self.train_channel_dataset.__getitem__(phase=Phase.TRAIN)
-        if self.detector.training_type == TrainingType.joint:
+        if self.detector.training_type == TrainingType.Joint:
             self.detector.train(message_words, received_words, snrs_list)
         # ---------------------------------------------------------
         message_words, received_words, snrs_list = self.test_channel_dataset.__getitem__(phase=Phase.TEST)
@@ -61,9 +61,9 @@ class Evaluator(object):
             mx_pilot, rx_pilot = mx[:conf.test_pilots_length], rx[:conf.test_pilots_length]
             mx_data, rx_data = mx[conf.test_pilots_length:], rx[conf.test_pilots_length:]
             # ---------------------------------------------------------
-            # online training - as in the config "training_type" option
-            if self.detector.training_type == TrainingType.online:
-                # run online training on the pilots part
+            # Online training - as in the config "training_type" option
+            if self.detector.training_type == TrainingType.Online:
+                # run Online training on the pilots part
                 self.detector.train(mx_pilot, rx_pilot)
             # ---------------------------------------------------------
             # detect data part after training on the pilot part

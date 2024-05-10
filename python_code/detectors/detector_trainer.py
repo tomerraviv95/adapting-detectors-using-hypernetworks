@@ -53,7 +53,7 @@ class Detector(nn.Module):
 
     def train(self, mx: torch.Tensor, rx: torch.Tensor, snrs_list=None):
         """
-        Every detector evaluater must have some function to adapt it online
+        Every detector evaluater must have some function to adapt it Online
         """
         pass
 

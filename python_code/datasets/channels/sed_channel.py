@@ -4,7 +4,7 @@ from python_code import conf
 from python_code.utils.constants import Phase
 
 # per user: (Min SNR, Max SNR, Number of blocks between peaks)
-TRAIN_SNR_PER_USER = [(-10, 10, 1), (-10, 10, 4), (-10, 10, 8), (-10, 10, 8),
+TRAIN_SNR_PER_USER = [(-10, 10, 5), (-10, 10, 10), (-10, 10, 20), (-10, 10, 8),
                       (-10, 10, 16), (-10, 10, 32), (1, 10, 1), (1, 10, 1),
                       (1, 10, 10), (1, 10, 10), (1, 10, 10), (1, 10, 10)]
 

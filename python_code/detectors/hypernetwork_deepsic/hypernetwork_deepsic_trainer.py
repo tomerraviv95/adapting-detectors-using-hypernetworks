@@ -22,7 +22,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         super().__init__()
         self.train_context_embedding = []
         self.test_context_embedding = []
-        if TRAINING_TYPES_DICT[conf.training_type] == TrainingType.online:
+        if TRAINING_TYPES_DICT[conf.training_type] == TrainingType.Online:
             raise ValueError("Online training is not implemented for this detector!!!")
 
     def __str__(self):
