@@ -3,7 +3,7 @@ from typing import List
 import torch
 from torch import nn
 
-EMB_SIZE = 8
+EMB_SIZE = 10
 
 
 class Hypernetwork(nn.Module):

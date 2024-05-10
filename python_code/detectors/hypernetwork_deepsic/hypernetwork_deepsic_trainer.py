@@ -9,7 +9,9 @@ from python_code.detectors.deepsic_trainer import DeepSICTrainer
 from python_code.detectors.hypernetwork_deepsic.hyper_deepsic import HyperDeepSICDetector
 from python_code.detectors.hypernetwork_deepsic.hypernetwork import Hypernetwork
 from python_code.detectors.hypernetwork_deepsic.user_embedder import UserEmbedder, USER_EMB_SIZE
-from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType, EPOCHS_DICT
+from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType
+
+EPOCHS = 25
 
 
 class HypernetworkDeepSICTrainer(DeepSICTrainer):
@@ -49,15 +51,14 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
 
     def train(self, message_words: torch.Tensor, received_words: torch.Tensor, snrs_list: List[List[float]]):
         total_parameters = self.user_embedder.parameters()
-        for k in range(conf.n_user):
-            total_parameters = chain(total_parameters, self.hypernetworks[k].parameters())
+        for user in range(conf.n_user):
+            total_parameters = chain(total_parameters, self.hypernetworks[user].parameters())
         self.optimizer = torch.optim.Adam(total_parameters, lr=self.lr)
         self.criterion = torch.nn.CrossEntropyLoss()
-        # iterate over the channels
-        epochs = EPOCHS_DICT[conf.training_type]
-        for _ in range(epochs):
-            loss = 0
+        for _ in range(EPOCHS):
+            print(1)
             for user in range(conf.n_user):
+                loss = 0
                 for i in range(len(snrs_list)):
                     mx, rx, snrs = message_words[i], received_words[i], snrs_list[i]
                     # Obtaining the DeepSIC networks for each user-symbol and the i-th iteration
@@ -72,7 +73,24 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
                     soft_estimation = self.hyper_deepsic(rx_all[user].float(), weights)
                     # calculate loss
                     loss += self._calc_loss(est=soft_estimation, mx=mx_all[user])
-            # back propagation
+                # back propagation
+                self.optimizer.zero_grad()
+                loss.backward()
+                self.optimizer.step()
+            for user in range(conf.n_user):
+                avg_per_user = 0
+                for i in range(len(snrs_list)):
+                    mx, rx, snrs = message_words[i], received_words[i], snrs_list[i]
+                    # Obtaining the DeepSIC networks for each user-symbol and the i-th iteration
+                    probs_vec = 0.5 * torch.ones(mx.shape).to(DEVICE)
+                    mx_all, rx_all = self._prepare_data_for_training(mx, rx, probs_vec)
+                    # get the context embedding for the hypernetwork based on the user and snrs
+                    context_embedding = self._get_context_embedding(snrs, user)
+                    self.train_context_embedding.append(context_embedding.detach().cpu().numpy())
+                    # Forward pass through the hypernetwork to generate weights
+                    weights = self.hypernetworks[user](context_embedding)
+                    # Set the generated weights to the base network in the forward pass of deepsic
+                    soft_estimation = self.hyper_deepsic(rx_all[user].float(), weights)
+                    avg_per_user += torch.sum(torch.argmax(soft_estimation, dim=1) == mx[:, user]) / len(mx[:, user])
+                print(avg_per_user / len(snrs_list))
             self.optimizer.zero_grad()
-            loss.backward()
-            self.optimizer.step()
