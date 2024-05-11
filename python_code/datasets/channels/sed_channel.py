@@ -4,11 +4,11 @@ from python_code import conf
 from python_code.utils.constants import Phase
 
 # per user: (Min SNR, Max SNR, Number of blocks between peaks)
-TRAIN_SNR_PER_USER = [(-10, 10, 5), (-10, 10, 10), (-10, 10, 20), (-10, 10, 8),
+TRAIN_SNR_PER_USER = [(-10, 20, 1), (-10, 20, 2), (-10, 20, 4), (-10, 20, 8),
                       (-10, 10, 16), (-10, 10, 32), (1, 10, 1), (1, 10, 1),
                       (1, 10, 10), (1, 10, 10), (1, 10, 10), (1, 10, 10)]
 
-TEST_SNR_PER_USER = [(0, 20, 3), (0, 20, 6), (0, 20, 9), (3, 10, 20),
+TEST_SNR_PER_USER = [(10, 20, 16), (0, 10, 32), (5, 15, 8), (5, 20, 4),
                      (5, 9, 3), (2, 26, 90), (-1, 10, 12), (3, 16, 20),
                      (1, 10, 10), (1, 10, 10), (1, 10, 10), (1, 10, 10)]
 
@@ -61,7 +61,7 @@ class SEDChannel:
         conv = np.matmul(s, snrs_scaled_h)
         w = np.random.randn(s.shape[0], conf.n_ant)
         y = conv + w
-        return y
+        return y,snrs_scaled_h
 
     @staticmethod
     def _compute_channel_signal_convolution(h: np.ndarray, s: np.ndarray) -> np.ndarray:

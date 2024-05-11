@@ -3,20 +3,20 @@ from typing import List
 import torch
 from torch import nn
 
-EMB_SIZE = 10
+from python_code import conf
 
+EMB = 256
 
 class Hypernetwork(nn.Module):
     def __init__(self, input_size: int, parameters_num: List[int]):
         super(Hypernetwork, self).__init__()
         self.activation = nn.ReLU()
-        self.fc_embedding = nn.Linear(input_size, EMB_SIZE)
-        self.fc_embedding2 = nn.Linear(EMB_SIZE, EMB_SIZE)
-        self.fc_outs = nn.ModuleList([nn.Linear(EMB_SIZE, cur_params) for cur_params in parameters_num])
+        self.embedding = nn.Linear((conf.n_user - 1) * input_size, EMB)
+        self.fc_outs = nn.ModuleList(
+            [nn.Linear(EMB, cur_params) for cur_params in parameters_num])
 
     def forward(self, rx: torch.Tensor) -> List[torch.Tensor]:
-        mid = self.activation(self.fc_embedding(rx))
-        embedding = self.activation(self.fc_embedding2(mid))
+        embedding = self.activation(self.embedding(rx))
         fc_weights = []
         for i in range(len(self.fc_outs)):
             fc_weight = self.fc_outs[i](embedding)

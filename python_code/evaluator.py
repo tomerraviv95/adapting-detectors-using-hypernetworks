@@ -84,7 +84,7 @@ class Evaluator(object):
         count = 0
         for test_context_embedding in test_context_embeddings:
             for unique_train_emb in all_unique_train:
-                if np.linalg.norm(unique_train_emb - test_context_embedding) < 1:
+                if np.linalg.norm(unique_train_emb - test_context_embedding) < 0.1:
                     count += 1
                     break
         print(f'Captured by training embedding: {count / len(test_context_embeddings) * 100}')
