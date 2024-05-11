@@ -1,18 +1,18 @@
 # general settings
 seed: 5 # run seed
-n_user: 3 # number of transmitting devices
+n_user: 6 # number of transmitting devices
 n_ant: 6 # number of received signals
 detector_type: 'hyper_deepsic' # ['seq_deepsic','rec_deepsic','hyper_deepsic']
 training_type: 'Joint' # ['Joint','Online']
 
 # train settings
-train_block_length: 10 # coherence block time, total size of pilot + data. values: int.
-train_blocks_num: 10 # number of validation frames. values: int.
+train_block_length: 100 # coherence block time, total size of pilot + data. values: int.
+train_blocks_num: 100 # number of validation frames. values: int.
 
 # test settings
-test_block_length: 600 # coherence block time, total size of pilot + data. values: int.
-test_pilots_length: 100 # pilot bits
-test_blocks_num: 10 # number of validation frames. values: int.
+test_block_length: 6000 # coherence block time, total size of pilot + data. values: int.
+test_pilots_length: 1000 # pilot bits
+test_blocks_num: 100 # number of validation frames. values: int.
 
 
 

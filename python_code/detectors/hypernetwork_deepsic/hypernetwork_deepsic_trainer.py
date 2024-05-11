@@ -48,7 +48,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         user_embeddings = self.user_embedder((torch.Tensor(snrs).to(DEVICE).reshape(-1, 1)))
         context_embedding = torch.zeros_like(user_embeddings[0]).to(DEVICE)
         for j in range(conf.n_user):
-            context_embedding += (-1) ** (j != user) * user_embeddings[j]
+            context_embedding += (-1) ** (j == user) * user_embeddings[j]
         return context_embedding
 
     def train(self, message_words: torch.Tensor, received_words: torch.Tensor, snrs_list: List[List[float]]):
@@ -68,9 +68,10 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
                     probs_vec = 0.5 * torch.ones(mx.shape).to(DEVICE)
                     mx_all, rx_all = self._prepare_data_for_training(mx, rx, probs_vec)
                     additivity_loss = self.additivity_loss(snrs)
-                    # get the context embedding for the hypernetwork based on the user and snrs
-                    context_embedding = self._get_context_embedding(snrs, user)
-                    self.train_context_embedding.append(context_embedding.detach().cpu().numpy())
+                    with torch.no_grad():
+                        # get the context embedding for the hypernetwork based on the user and snrs
+                        context_embedding = self._get_context_embedding(snrs, user)
+                        self.train_context_embedding.append(context_embedding.detach().cpu().numpy())
                     # Forward pass through the hypernetwork to generate weights
                     weights = self.hypernetworks[user](context_embedding)
                     # Set the generated weights to the base network in the forward pass of deepsic
