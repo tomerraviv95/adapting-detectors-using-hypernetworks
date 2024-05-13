@@ -71,8 +71,8 @@ class Evaluator(object):
             ser = calculate_error_rate(detected_words, mx_data)
             ser_list.append(ser)
             print(f'symbol error rate: {ser}')
-        if conf.detector_type == DetectorType.hyper_deepsic.name:
-            self.calc_context_overlap()
+        # if conf.detector_type == DetectorType.hyper_deepsic.name:
+        #     self.calc_context_overlap()
         metrics_output = MetricOutput(ser_list=ser_list)
         print(f'Avg SER:{sum(metrics_output.ser_list) / len(metrics_output.ser_list)}')
         return metrics_output

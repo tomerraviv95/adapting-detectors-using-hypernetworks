@@ -5,7 +5,7 @@ from torch import nn
 
 from python_code import conf
 
-USER_EMB_SIZE = conf.n_user
+USER_EMB_SIZE = 16
 
 
 class UserEmbedder(nn.Module):

@@ -24,8 +24,9 @@ class HyperDeepSICDetector(nn.Module):
     def __init__(self, sizes: List[int]):
         super(HyperDeepSICDetector, self).__init__()
         self.sizes = sizes
+        self.activation = nn.ReLU()
 
     def forward(self, rx: torch.Tensor, var: List[torch.Tensor]) -> torch.Tensor:
-        mid = torch.relu(F.linear(rx, var[0].reshape(self.sizes[0]), var[1].reshape(self.sizes[1])))
-        out = F.linear(mid, var[2].reshape(self.sizes[2]), var[3].reshape(self.sizes[3]))
+        mid = self.activation(F.linear(rx, weight=var[0].reshape(self.sizes[0]), bias=var[1].reshape(self.sizes[1])))
+        out = F.linear(mid, weight=var[2].reshape(self.sizes[2]), bias=var[3].reshape(self.sizes[3]))
         return out

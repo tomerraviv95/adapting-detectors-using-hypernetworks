@@ -37,9 +37,9 @@ class RecDeepSICTrainer(DeepSICTrainer):
             soft_estimation = single_model(y_total)
             self._run_train_loop(soft_estimation, mx)
 
-    def train_models(self, model: List[DeepSICDetector], tx_all: List[torch.Tensor], rx_all: List[torch.Tensor]):
+    def train_models(self, model: List[DeepSICDetector], mx_all: List[torch.Tensor], rx_all: List[torch.Tensor]):
         for user in range(conf.n_user):
-            self.train_model(model[user], tx_all[user], rx_all[user])
+            self.train_model(model[user], mx_all[user], rx_all[user])
 
     def train(self, mx: torch.Tensor, rx: torch.Tensor, snrs_list=None):
         """

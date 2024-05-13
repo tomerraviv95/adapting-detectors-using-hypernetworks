@@ -12,7 +12,7 @@ class DeepSICTrainer(Detector):
 
     def __init__(self):
         self.lr = 5e-3
-        self.iterations = 3
+        self.iterations = 1
         self.hidden_size = HIDDEN_SIZES_DICT[TRAINING_TYPES_DICT[conf.training_type]]
         super().__init__()
 

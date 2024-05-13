@@ -16,7 +16,7 @@ np.random.seed(conf.seed)
 
 class Detector(nn.Module):
     """
-    Implements the general symbols detector
+    Implements the general symbols _detector
     """
 
     def __init__(self):
@@ -30,9 +30,9 @@ class Detector(nn.Module):
 
     def _initialize_detector(self):
         """
-        Every evaluater must have some base detector
+        Every evaluater must have some base _detector
         """
-        self.detector = None
+        self._detector = None
 
     # calculate train loss
     def _calc_loss(self, est: torch.Tensor, mx: torch.Tensor) -> torch.Tensor:
@@ -53,12 +53,12 @@ class Detector(nn.Module):
 
     def train(self, mx: torch.Tensor, rx: torch.Tensor, snrs_list=None):
         """
-        Every detector evaluater must have some function to adapt it Online
+        Every _detector evaluater must have some function to adapt it Online
         """
         pass
 
     def forward(self, rx: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """
-        Every evaluater must have some forward pass for its detector
+        Every evaluater must have some forward pass for its _detector
         """
         pass
