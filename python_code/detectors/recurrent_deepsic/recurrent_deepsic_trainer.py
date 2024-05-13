@@ -50,7 +50,7 @@ class RecDeepSICTrainer(DeepSICTrainer):
             mx = mx.reshape(-1, mx.shape[2])
             rx = rx.reshape(-1, rx.shape[2])
         # Initializing the probabilities
-        probs_vec = 0.5 * torch.ones(mx.shape).to(DEVICE)
+        probs_vec = torch.rand(mx.shape).to(DEVICE)
         # Obtaining the DeepSIC networks for each user-symbol and the i-th iteration
         mx_all, rx_all = self._prepare_data_for_training(mx, rx, probs_vec)
         # Training the DeepSIC networks for the iteration>1

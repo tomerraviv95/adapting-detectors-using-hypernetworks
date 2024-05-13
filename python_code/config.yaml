@@ -1,5 +1,5 @@
 # general settings
-seed: 4 # run seed
+seed: 5 # run seed
 n_user: 4 # number of transmitting devices
 n_ant: 6 # number of received signals
 detector_type: 'hyper_deepsic' # ['seq_deepsic','rec_deepsic','hyper_deepsic']
