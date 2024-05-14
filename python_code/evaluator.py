@@ -71,23 +71,9 @@ class Evaluator(object):
             ser = calculate_error_rate(detected_words, mx_data)
             ser_list.append(ser)
             print(f'symbol error rate: {ser}')
-        # if conf.detector_type == DetectorType.hyper_deepsic.name:
-        #     self.calc_context_overlap()
         metrics_output = MetricOutput(ser_list=ser_list)
         print(f'Avg SER:{sum(metrics_output.ser_list) / len(metrics_output.ser_list)}')
         return metrics_output
-
-    def calc_context_overlap(self):
-        train_context_embeddings = self.detector.train_context_embedding
-        test_context_embeddings = self.detector.test_context_embedding
-        all_unique_train = np.unique(np.array(train_context_embeddings), axis=0)
-        count = 0
-        for test_context_embedding in test_context_embeddings:
-            for unique_train_emb in all_unique_train:
-                if np.linalg.norm(unique_train_emb - test_context_embedding) < 0.1:
-                    count += 1
-                    break
-        print(f'Captured by training embedding: {count / len(test_context_embeddings) * 100}')
 
 
 if __name__ == "__main__":

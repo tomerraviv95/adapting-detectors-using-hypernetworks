@@ -18,9 +18,4 @@ class UserEmbedder(nn.Module):
     def forward(self, snr_values: torch.Tensor) -> List[torch.Tensor]:
         embedding = self.fc_embedding(snr_values)
         output = self.fc_embedding2(self.activation(embedding))
-        # desired_min = -1.0
-        # desired_max = 1.0
-        # min_val = torch.min(output)
-        # max_val = torch.max(output)
-        # normalized_output = desired_min + (output - min_val) * (desired_max - desired_min) / (max_val - min_val)
-        return output
+        return torch.clip(output, min=-1, max=1)
