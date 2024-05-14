@@ -11,7 +11,7 @@ from python_code.detectors.deepsic_trainer import DeepSICTrainer
 from python_code.detectors.hypernetwork_deepsic.hyper_deepsic import HyperDeepSICDetector
 from python_code.detectors.hypernetwork_deepsic.hypernetwork import Hypernetwork
 from python_code.detectors.hypernetwork_deepsic.user_embedder import UserEmbedder, USER_EMB_SIZE
-from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType, HIDDEN_SIZES_DICT, MAX_USERS
+from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType, HIDDEN_SIZES_DICT, MAX_USERS, EPOCHS_DICT
 
 EPOCHS = 10
 
@@ -20,6 +20,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
 
     def __init__(self):
         super().__init__()
+        self.lr = 1e-3
         self.train_context_embedding = []
         self.test_context_embedding = []
         if TRAINING_TYPES_DICT[conf.training_type] == TrainingType.Online:
@@ -68,8 +69,9 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         total_parameters = chain(total_parameters, self.this_user_vec.parameters())
         total_parameters = chain(total_parameters, self.no_user_vec.parameters())
         self.optimizer = torch.optim.Adam(total_parameters, lr=self.lr)
-        for epoch in range(EPOCHS):
-            curr_batch = np.random.choice(len(hs), 50)
+        epochs = EPOCHS_DICT[conf.training_type]
+        for epoch in range(epochs):
+            curr_batch = np.random.choice(len(hs), 20)
             for i in curr_batch:
                 for user in range(conf.n_user):
                     mx, rx, h = message_words[i], received_words[i], hs[i]
