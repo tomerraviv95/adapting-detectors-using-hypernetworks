@@ -1,7 +1,7 @@
 from python_code.utils.constants import Phase
 
-NUMBER_OF_USERS_DICT = {Phase.TRAIN: {(0, 200): 12, (200, 400): 13, (400, 600): 14, (600, 800): 15, (800, 1000): 16},
-                        Phase.TEST: {(0, 20): 12, (20, 40): 13, (40, 60): 14, (60, 80): 15, (80, 100): 16}}
+NUMBER_OF_USERS_DICT = {Phase.TRAIN: {(0, 200): 6, (200, 400): 7, (400, 600): 8, (600, 800): 9, (800, 1000): 10},
+                        Phase.TEST: {(0, 20): 10, (20, 40): 9, (40, 60): 8, (60, 80): 6, (80, 100): 7}}
 
 
 class UsersNetwork:

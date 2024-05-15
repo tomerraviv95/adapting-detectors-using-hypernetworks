@@ -42,8 +42,6 @@ LINESTYLES_DICT = {'Joint Hypernetwork-based DeepSIC': 'solid',
 
 if __name__ == "__main__":
     params_list = [
-        {'detector_type': 'seq_deepsic', 'training_type': 'Joint'},
-        {'detector_type': 'seq_deepsic', 'training_type': 'Online'},
         {'detector_type': 'rec_deepsic', 'training_type': 'Joint'},
         {'detector_type': 'rec_deepsic', 'training_type': 'Online'},
         {'detector_type': 'hyper_deepsic', 'training_type': 'Joint'},
@@ -73,6 +71,7 @@ if __name__ == "__main__":
     plt.grid(which='both', ls='--')
     leg = plt.legend(loc='lower right', prop={'size': 20}, handlelength=4)
     plt.yscale('log')
-    plt.savefig(os.path.join(FIGURES_DIR, folder_name, f'ser_{conf.n_user}_{conf.n_ant}.png'),
+    plt.ylim(bottom=10 ** -3)
+    plt.savefig(os.path.join(FIGURES_DIR, folder_name, f'ser_{conf.n_ant}.png'),
                 bbox_inches='tight')
     plt.show()
