@@ -10,8 +10,8 @@ class Generator:
         self.block_length = block_length
         self.pilots_length = pilots_length
 
-    def generate(self):
-        pilots = self._bits_generator.integers(0, 2, size=(self.pilots_length, conf.n_user))
-        data = self._bits_generator.integers(0, 2, size=(self.block_length - self.pilots_length, conf.n_user))
+    def generate(self, users: int) -> np.ndarray:
+        pilots = self._bits_generator.integers(0, 2, size=(self.pilots_length, users))
+        data = self._bits_generator.integers(0, 2, size=(self.block_length - self.pilots_length, users))
         mx = np.concatenate([pilots, data])
         return mx

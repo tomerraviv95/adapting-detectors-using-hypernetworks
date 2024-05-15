@@ -32,19 +32,23 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
     def _initialize_detector(self):
         self.user_embedder = UserEmbedder().to(DEVICE)
         self.hidden_size = HIDDEN_SIZES_DICT[TrainingType.Online]
-        self.base_deepsic = DeepSICDetector(self.hidden_size)
+        self.base_deepsic = DeepSICDetector(MAX_USERS, self.hidden_size)
         self.no_user_vec = Embedding(1, USER_EMB_SIZE).to(DEVICE)
         self.this_user_vec = Embedding(1, USER_EMB_SIZE).to(DEVICE)
-        total_parameters = [param.numel() for param in self.base_deepsic.parameters()]
-        self.hypernetwork = Hypernetwork(USER_EMB_SIZE, total_parameters).to(DEVICE)
+        max_parameters = [param.numel() for param in self.base_deepsic.parameters()]
+        self.hypernetwork = Hypernetwork(USER_EMB_SIZE, max_parameters).to(DEVICE)
         self.hyper_deepsic = HyperDeepSICDetector([param.size() for param in self.base_deepsic.parameters()])
 
     def _soft_symbols_from_probs(self, input: torch.Tensor, user: int, i: int, hs: List[float]) -> torch.Tensor:
         if i == 1:
             context_embedding = self._get_context_embedding(hs, user)
-            self.inference_weights = [None for _ in range(conf.n_user)]
+            self.inference_weights = [None for _ in range(hs.shape[0])]
             self.inference_weights[user] = self.hypernetwork(context_embedding)
-        deepsic_output = self.hyper_deepsic(input.float(), self.inference_weights[user])
+        # Set the generated weights to the base network in the forward pass of deepsic
+        hyper_input = input.float()
+        padding = torch.zeros([hyper_input.shape[0], MAX_USERS - hs.shape[0]]).to(DEVICE)
+        hyper_input = torch.cat([hyper_input, padding], dim=1)
+        deepsic_output = self.hyper_deepsic(hyper_input, self.inference_weights[user])
         return self.softmax(deepsic_output)
 
     def _get_context_embedding(self, H: torch.Tensor, user: int) -> torch.Tensor:
@@ -52,7 +56,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         ind = torch.LongTensor([0]).to(DEVICE)
         context_embedding = []
         for j in range(MAX_USERS):
-            if j in range(conf.n_user):
+            if j in range(H.shape[0]):
                 if user != j:
                     context_embedding.append(user_embeddings[j].reshape(1, -1))
                 else:
@@ -64,6 +68,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
 
     def train(self, message_words: torch.Tensor, received_words: torch.Tensor, hs: List[List[float]]):
         self.criterion = torch.nn.CrossEntropyLoss()
+
         total_parameters = self.user_embedder.parameters()
         total_parameters = chain(total_parameters, self.hypernetwork.parameters())
         total_parameters = chain(total_parameters, self.this_user_vec.parameters())
@@ -73,7 +78,8 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         for epoch in range(epochs):
             curr_batch = np.random.choice(len(hs), 20)
             for i in curr_batch:
-                for user in range(conf.n_user):
+                n_users = hs[i].shape[0]
+                for user in range(n_users):
                     mx, rx, h = message_words[i], received_words[i], hs[i]
                     # Obtaining the DeepSIC networks for each user-symbol and the i-th iteration
                     probs_vec = torch.rand(mx.shape).to(DEVICE)
@@ -83,7 +89,10 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
                     # Forward pass through the hypernetwork to generate weights
                     weights = self.hypernetwork(context_embedding)
                     # Set the generated weights to the base network in the forward pass of deepsic
-                    soft_estimation = self.hyper_deepsic(rx_all[user].float(), weights)
+                    hyper_input = rx_all[user].float()
+                    padding = torch.zeros([hyper_input.shape[0], MAX_USERS - h.shape[0]]).to(DEVICE)
+                    hyper_input = torch.cat([hyper_input, padding], dim=1)
+                    soft_estimation = self.hyper_deepsic(hyper_input, weights)
                     # calculate loss
                     loss = self._calc_loss(est=soft_estimation, mx=mx[:, user])
                     # back propagation

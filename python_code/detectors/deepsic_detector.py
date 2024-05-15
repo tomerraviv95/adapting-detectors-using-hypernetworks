@@ -16,13 +16,12 @@ class DeepSICDetector(nn.Module):
     ================================
     """
 
-    def __init__(self, hidden_size: int):
+    def __init__(self, n_user: int, hidden_size: int):
         super(DeepSICDetector, self).__init__()
-        classes_num = 2
-        linear_input = conf.n_ant + (classes_num - 1) * (conf.n_user - 1)  # from DeepSIC paper
+        linear_input = conf.n_ant + (n_user - 1)  # from DeepSIC paper
         self.activation = nn.ReLU()
         self.fc1 = nn.Linear(linear_input, hidden_size)
-        self.fc2 = nn.Linear(hidden_size, classes_num)
+        self.fc2 = nn.Linear(hidden_size, 2)
 
     def forward(self, rx: torch.Tensor) -> torch.Tensor:
         mid = self.activation(self.fc1(rx))

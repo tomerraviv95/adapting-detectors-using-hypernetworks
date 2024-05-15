@@ -9,6 +9,7 @@ from python_code import DEVICE, conf
 from python_code.datasets.communications_blocks.generator import Generator
 from python_code.datasets.communications_blocks.modulator import BPSKModulator
 from python_code.datasets.communications_blocks.transmitter import Transmitter
+from python_code.datasets.communications_blocks.users_network import UsersNetwork
 from python_code.utils.constants import Phase
 
 
@@ -18,36 +19,39 @@ class ChannelModelDataset(Dataset):
     Returns (transmitted, received, channel_coefficients) batch.
     """
 
-    def __init__(self, block_length: int, blocks_num: int, pilots_length: int):
+    def __init__(self, block_length: int, blocks_num: int, pilots_length: int, phase: Phase):
         self.block_length = block_length
         self.blocks_num = blocks_num
+        self.users_network = UsersNetwork(phase)
         self.generator = Generator(block_length, pilots_length)
         self.modulator = BPSKModulator()
-        self.transmitter = Transmitter()
+        self.transmitter = Transmitter(phase)
 
-    def get_data(self, phase, database: list):
+    def get_data(self, database: List[Tuple[torch.Tensor, torch.Tensor, torch.Tensor]]):
         if database is None:
             database = []
-        mx_full = np.empty((self.blocks_num, self.block_length, conf.n_user))
+        mx_full = []
         rx_full = np.empty((self.blocks_num, self.block_length, conf.n_ant))
         hs = []
         # accumulate words until reaches desired number
         for index in range(self.blocks_num):
-            mx = self.generator.generate()
+            users = self.users_network.get_current_users(index)
+            mx = self.generator.generate(users)
             tx = self.modulator.modulate(mx)
-            rx, h = self.transmitter.transmit(tx, index, phase)
+            rx, h = self.transmitter.transmit(tx, index, users)
             # accumulate
-            mx_full[index] = mx
+            mx_full.append(mx)
             rx_full[index] = rx
             hs.append(h)
 
         database.append((mx_full, rx_full, hs))
 
-    def __getitem__(self, phase: Phase) -> Tuple[torch.Tensor, torch.Tensor, List[List[float]]]:
+    def __getitem__(self) -> Tuple[torch.Tensor, torch.Tensor, List[List[float]]]:
         database = []
         # do not change max_workers
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-            executor.submit(self.get_data, phase, database)
+            executor.submit(self.get_data, database)
         mx, rx, hs = (arrays for arrays in zip(*database))
-        mx, rx = torch.Tensor(np.concatenate(mx)).to(device=DEVICE), torch.from_numpy(np.concatenate(rx)).to(device=DEVICE)
+        rx = torch.from_numpy(np.concatenate(rx)).to(device=DEVICE)
+        mx = [torch.Tensor(mx[0][i]).to(device=DEVICE) for i in range(len(mx[0]))]
         return mx, rx, hs[0]

@@ -6,11 +6,11 @@ from python_code.utils.constants import Phase
 SNR = 8
 # per user: (Min SNR, Max SNR, Number of blocks between peaks)
 TRAIN_SNR_PER_USER = [(SNR, 2 * SNR, 5), (SNR, 2 * SNR, 5), (SNR, 2 * SNR, 5), (SNR, 2 * SNR, 5),
-                      (-10, 10, 16), (-10, 10, 32), (1, 10, 1), (1, 10, 1),
+                      (SNR, 2 * SNR, 5), (SNR, 2 * SNR, 5), (SNR, 2 * SNR, 5), (SNR, 2 * SNR, 5),
                       (1, 10, 10), (1, 10, 10), (1, 10, 10), (1, 10, 10)]
 
 TEST_SNR_PER_USER = [(SNR, 2 * SNR, 5), (SNR, 2 * SNR, 10), (SNR, 2 * SNR, 15), (SNR, 2 * SNR, 20),
-                     (5, 9, 3), (2, 26, 90), (-1, 10, 12), (3, 16, 20),
+                     (SNR, 2 * SNR, 5), (SNR, 2 * SNR, 10), (SNR, 2 * SNR, 15), (SNR, 2 * SNR, 20),
                      (1, 10, 10), (1, 10, 10), (1, 10, 10), (1, 10, 10)]
 
 SNR_PER_USER_DICT = {Phase.TRAIN: TRAIN_SNR_PER_USER, Phase.TEST: TEST_SNR_PER_USER}
@@ -54,8 +54,8 @@ class SEDChannel:
         :return: received word y
         """
         snrs = 10 ** (snrs / 20)
-        snrs_mat = np.eye(conf.n_user)
-        for i in range(conf.n_user):
+        snrs_mat = np.eye(h.shape[0])
+        for i in range(len(snrs_mat)):
             snrs_mat[i, i] = snrs[i]
         # Users X antennas matrix. Scale each row by the SNR of the given user.
         snrs_scaled_h = np.matmul(snrs_mat, h)

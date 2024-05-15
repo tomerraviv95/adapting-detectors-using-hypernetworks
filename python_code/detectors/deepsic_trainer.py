@@ -40,8 +40,8 @@ class DeepSICTrainer(Detector):
         """
         mx_all = []
         rx_all = []
-        for k in range(conf.n_user):
-            idx = [user_i for user_i in range(conf.n_user) if user_i != k]
+        for k in range(mx.shape[1]):
+            idx = [user_i for user_i in range(mx.shape[1]) if user_i != k]
             current_y_train = torch.cat((rx, probs_vec[:, idx].reshape(rx.shape[0], -1)), dim=1)
             mx_all.append(mx[:, k])
             rx_all.append(current_y_train)
@@ -52,18 +52,18 @@ class DeepSICTrainer(Detector):
         Propagates the probabilities through the learnt networks for a single iteration.
         """
         next_probs_vec = torch.zeros(probs_vec.shape).to(DEVICE)
-        for user in range(conf.n_user):
-            idx = [user_i for user_i in range(conf.n_user) if user_i != user]
+        for user in range(probs_vec.shape[1]):
+            idx = [user_i for user_i in range(probs_vec.shape[1]) if user_i != user]
             input = torch.cat((rx, probs_vec[:, idx].reshape(rx.shape[0], -1)), dim=1)
             with torch.no_grad():
-                output = self._soft_symbols_from_probs(input, user, i, snrs_list)
+                output = self._soft_symbols_from_probs(input, user, hs=snrs_list, i=i)
             next_probs_vec[:, user] = output[:, 1:].reshape(next_probs_vec[:, user].shape)
         return next_probs_vec
 
-    def forward(self, rx: torch.Tensor, snrs_list: List[List[float]] = None) -> torch.Tensor:
+    def forward(self, rx: torch.Tensor, snrs_list: List[List[float]] = None, n_user=None) -> torch.Tensor:
         with torch.no_grad():
             # detect and decode
-            probs_vec = 0.5 * torch.ones([rx.shape[0], conf.n_user]).to(DEVICE).float()
+            probs_vec = 0.5 * torch.ones([rx.shape[0], n_user]).to(DEVICE).float()
             for i in range(self.iterations):
                 probs_vec = self._calculate_posteriors(i + 1, probs_vec, rx, snrs_list)
             detected_words = self._symbols_from_prob(probs_vec)

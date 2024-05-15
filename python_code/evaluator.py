@@ -30,10 +30,11 @@ class Evaluator(object):
         self.detector = DETECTORS_TYPE_DICT[conf.detector_type]()
         self.train_channel_dataset = ChannelModelDataset(block_length=conf.train_block_length,
                                                          blocks_num=conf.train_blocks_num,
-                                                         pilots_length=1)
+                                                         pilots_length=1, phase=Phase.TRAIN)
         self.test_channel_dataset = ChannelModelDataset(block_length=conf.test_block_length,
                                                         blocks_num=conf.test_blocks_num,
-                                                        pilots_length=conf.test_pilots_length)
+                                                        pilots_length=conf.test_pilots_length,
+                                                        phase=Phase.TEST)
 
     def evaluate(self) -> MetricOutput:
         """
@@ -47,11 +48,11 @@ class Evaluator(object):
         ser_list, ber_list, ece_list = [], [], []
         # ---------------------------------------------------------
         # Joint training - as in the config "training_type" option
-        message_words, received_words, hs = self.train_channel_dataset.__getitem__(phase=Phase.TRAIN)
+        message_words, received_words, hs = self.train_channel_dataset.__getitem__()
         if self.detector.training_type == TrainingType.Joint:
             self.detector.train(message_words, received_words, hs)
         # ---------------------------------------------------------
-        message_words, received_words, hs = self.test_channel_dataset.__getitem__(phase=Phase.TEST)
+        message_words, received_words, hs = self.test_channel_dataset.__getitem__()
         # detect sequentially
         for block_ind in range(conf.test_blocks_num):
             print('*' * 20)
@@ -64,10 +65,10 @@ class Evaluator(object):
             # Online training - as in the config "training_type" option
             if self.detector.training_type == TrainingType.Online:
                 # run Online training on the pilots part
-                self.detector.train(mx_pilot, rx_pilot)
+                self.detector.train([mx_pilot], [rx_pilot])
             # ---------------------------------------------------------
             # detect data part after training on the pilot part
-            detected_words = self.detector.forward(rx_data, hs[block_ind])
+            detected_words = self.detector.forward(rx_data, hs[block_ind], n_user=mx.shape[1])
             ser = calculate_error_rate(detected_words, mx_data)
             ser_list.append(ser)
             print(f'symbol error rate: {ser}')
