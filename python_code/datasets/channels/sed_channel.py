@@ -3,16 +3,18 @@ import numpy as np
 from python_code import conf
 from python_code.utils.constants import Phase
 
-SNR = 8
-COEF = 1
+SNR = 7
+COEF = 2
 # per user: (Min SNR, Max SNR, Number of blocks between peaks)
-TRAIN_SNR_PER_USER = [(SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5),
-                      (SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5),
-                      (SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5)]
-
-TEST_SNR_PER_USER = [(SNR, COEF * SNR, 5), (SNR, COEF * SNR, 10), (SNR, COEF * SNR, 15), (SNR, COEF * SNR, 20),
-                     (SNR, COEF * SNR, 20), (SNR, COEF * SNR, 20), (SNR, COEF * SNR, 25), (SNR, COEF * SNR, 25),
-                     (SNR, COEF * SNR, 30), (SNR, COEF * SNR, 30), (SNR, COEF * SNR, 35), (SNR, COEF * SNR, 40)]
+TRAIN_SNR_PER_USER = [(SNR, COEF * SNR, 5), (SNR, COEF * SNR, 10), (SNR, COEF * SNR, 15), (SNR, COEF * SNR, 20),
+                      (SNR, COEF * SNR, 25), (SNR, COEF * SNR, 30), (SNR, COEF * SNR, 35), (SNR, COEF * SNR, 40),
+                      (SNR, COEF * SNR, 45), (SNR, COEF * SNR, 50), (SNR, COEF * SNR, 55), (SNR, COEF * SNR, 60),
+                      (SNR, COEF * SNR, 25), (SNR, COEF * SNR, 30), (SNR, COEF * SNR, 35), (SNR, COEF * SNR, 40), ]
+SNR2 = 7
+TEST_SNR_PER_USER = [(SNR2, COEF * SNR2, 3), (SNR2, COEF * SNR2, 10), (SNR2, COEF * SNR2, 7), (SNR2, COEF * SNR2, 12),
+                     (SNR2, COEF * SNR2, 15), (SNR2, COEF * SNR2, 22), (SNR2, COEF * SNR2, 23), (SNR2, COEF * SNR2, 14),
+                     (SNR2, COEF * SNR2, 25), (SNR2, COEF * SNR2, 18), (SNR2, COEF * SNR2, 30), (SNR2, COEF * SNR2, 11),
+                     (SNR2, COEF * SNR2, 15), (SNR2, COEF * SNR2, 22), (SNR2, COEF * SNR2, 23), (SNR2, COEF * SNR2, 14)]
 
 SNR_PER_USER_DICT = {Phase.TRAIN: TRAIN_SNR_PER_USER, Phase.TEST: TEST_SNR_PER_USER}
 
