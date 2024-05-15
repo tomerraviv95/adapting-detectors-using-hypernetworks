@@ -12,7 +12,3 @@ train_blocks_num: 1000 # number of validation frames. values: int.
 test_block_length: 11000 # coherence block time, total size of pilot + data. values: int.
 test_pilots_length: 1000 # pilot bits
 test_blocks_num: 100 # number of validation frames. values: int.
-
-
-
-

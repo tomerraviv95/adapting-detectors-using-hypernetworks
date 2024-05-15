@@ -4,14 +4,15 @@ from python_code import conf
 from python_code.utils.constants import Phase
 
 SNR = 8
+COEF = 1
 # per user: (Min SNR, Max SNR, Number of blocks between peaks)
-TRAIN_SNR_PER_USER = [(SNR, 2 * SNR, 5), (SNR, 2 * SNR, 5), (SNR, 2 * SNR, 5), (SNR, 2 * SNR, 5),
-                      (SNR, 2 * SNR, 5), (SNR, 2 * SNR, 5), (SNR, 2 * SNR, 5), (SNR, 2 * SNR, 5),
-                      (1, 10, 10), (1, 10, 10), (1, 10, 10), (1, 10, 10)]
+TRAIN_SNR_PER_USER = [(SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5),
+                      (SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5),
+                      (SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5), (SNR, COEF * SNR, 5)]
 
-TEST_SNR_PER_USER = [(SNR, 2 * SNR, 5), (SNR, 2 * SNR, 10), (SNR, 2 * SNR, 15), (SNR, 2 * SNR, 20),
-                     (SNR, 2 * SNR, 5), (SNR, 2 * SNR, 10), (SNR, 2 * SNR, 15), (SNR, 2 * SNR, 20),
-                     (1, 10, 10), (1, 10, 10), (1, 10, 10), (1, 10, 10)]
+TEST_SNR_PER_USER = [(SNR, COEF * SNR, 5), (SNR, COEF * SNR, 10), (SNR, COEF * SNR, 15), (SNR, COEF * SNR, 20),
+                     (SNR, COEF * SNR, 20), (SNR, COEF * SNR, 20), (SNR, COEF * SNR, 25), (SNR, COEF * SNR, 25),
+                     (SNR, COEF * SNR, 30), (SNR, COEF * SNR, 30), (SNR, COEF * SNR, 35), (SNR, COEF * SNR, 40)]
 
 SNR_PER_USER_DICT = {Phase.TRAIN: TRAIN_SNR_PER_USER, Phase.TEST: TEST_SNR_PER_USER}
 
