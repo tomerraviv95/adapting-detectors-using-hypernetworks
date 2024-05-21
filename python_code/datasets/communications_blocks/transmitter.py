@@ -16,4 +16,4 @@ class Transmitter:
         snrs = SEDChannel.get_snrs(users, index, self.phase)
         # pass through datasets
         rx = SEDChannel.transmit(s=s, h=H, snrs=snrs)
-        return rx, np.concatenate([H, snrs.reshape(-1, 1)], axis=1)
+        return rx

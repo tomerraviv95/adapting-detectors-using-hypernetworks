@@ -68,7 +68,6 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
 
     def train(self, message_words: torch.Tensor, received_words: torch.Tensor, hs: List[List[float]]):
         self.criterion = torch.nn.CrossEntropyLoss()
-
         total_parameters = self.user_embedder.parameters()
         total_parameters = chain(total_parameters, self.hypernetwork.parameters())
         total_parameters = chain(total_parameters, self.this_user_vec.parameters())

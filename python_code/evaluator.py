@@ -7,6 +7,7 @@ import torch
 from python_code import conf
 from python_code.datasets.channel_dataset import ChannelModelDataset
 from python_code.detectors import DETECTORS_TYPE_DICT
+from python_code.utils.channel_estimate import ls_channel_estimation
 from python_code.utils.constants import Phase, TrainingType
 from python_code.utils.metrics import calculate_error_rate
 
@@ -48,11 +49,13 @@ class Evaluator(object):
         ser_list, ber_list, ece_list = [], [], []
         # ---------------------------------------------------------
         # Joint training - as in the config "training_type" option
-        message_words, received_words, hs = self.train_channel_dataset.__getitem__()
+        message_words, received_words = self.train_channel_dataset.__getitem__()
         if self.detector.training_type == TrainingType.Joint:
-            self.detector.train(message_words, received_words, hs)
+            H_hats = [ls_channel_estimation(mx_pilots, rx_pilots) for mx_pilots, rx_pilots in
+                      zip(message_words, received_words)]
+            self.detector.train(message_words, received_words, H_hats)
         # ---------------------------------------------------------
-        message_words, received_words, hs = self.test_channel_dataset.__getitem__()
+        message_words, received_words = self.test_channel_dataset.__getitem__()
         # detect sequentially
         for block_ind in range(conf.test_blocks_num):
             print('*' * 20)
@@ -66,9 +69,14 @@ class Evaluator(object):
             if self.detector.training_type == TrainingType.Online:
                 # run Online training on the pilots part
                 self.detector.train([mx_pilot], [rx_pilot])
+                H_hat = [mx_pilot.shape[1]]
+            else:
+                # additional basic ls estimation of the channel
+                H_hat = ls_channel_estimation(mx_pilot, rx_pilot)
             # ---------------------------------------------------------
             # detect data part after training on the pilot part
-            detected_words = self.detector.forward(rx_data, hs[block_ind], n_user=mx.shape[1])
+            detected_words = self.detector.forward(rx_data, H_hat, n_user=mx.shape[1])
+            # detected_words = self.detector.forward(rx_data, hs[block_ind], n_user=mx.shape[1])
             ser = calculate_error_rate(detected_words, mx_data)
             ser_list.append(ser)
             print(f'symbol error rate: {ser}')

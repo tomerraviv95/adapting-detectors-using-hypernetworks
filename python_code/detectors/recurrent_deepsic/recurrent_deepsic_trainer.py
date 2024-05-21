@@ -24,7 +24,7 @@ class RecDeepSICTrainer(DeepSICTrainer):
                          range(MAX_USERS)}
 
     def _soft_symbols_from_probs(self, input: torch.Tensor, user: int, hs: List[float], i: int = None) -> torch.Tensor:
-        n_users = hs.shape[0]
+        n_users = hs[0]
         return self.softmax(self.detector[n_users][user](input.float()))
 
     def train_model(self, single_model: nn.Module, mx: List[torch.Tensor], rx: List[torch.Tensor]):
