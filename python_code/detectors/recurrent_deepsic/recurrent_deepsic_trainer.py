@@ -23,9 +23,8 @@ class RecDeepSICTrainer(DeepSICTrainer):
         self.detector = {user: [DeepSICDetector(user, self.hidden_size).to(DEVICE) for _ in range(user)] for user in
                          range(MAX_USERS)}
 
-    def _soft_symbols_from_probs(self, input: torch.Tensor, user: int, hs: List[float], i: int = None) -> torch.Tensor:
-        n_users = hs[0]
-        return self.softmax(self.detector[n_users][user](input.float()))
+    def _soft_symbols_from_probs(self, input: torch.Tensor, user: int, hs: int, i: int = None) -> torch.Tensor:
+        return self.softmax(self.detector[hs][user](input.float()))
 
     def train_model(self, single_model: nn.Module, mx: List[torch.Tensor], rx: List[torch.Tensor]):
         """

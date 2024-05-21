@@ -8,7 +8,7 @@ from python_code import conf
 from python_code.datasets.channel_dataset import ChannelModelDataset
 from python_code.detectors import DETECTORS_TYPE_DICT
 from python_code.utils.channel_estimate import ls_channel_estimation
-from python_code.utils.constants import Phase, TrainingType
+from python_code.utils.constants import Phase, TrainingType, DetectorType
 from python_code.utils.metrics import calculate_error_rate
 
 random.seed(conf.seed)
@@ -69,10 +69,13 @@ class Evaluator(object):
             if self.detector.training_type == TrainingType.Online:
                 # run Online training on the pilots part
                 self.detector.train([mx_pilot], [rx_pilot])
-                H_hat = [mx_pilot.shape[1]]
-            else:
-                # additional basic ls estimation of the channel
+
+            if conf.detector_type == DetectorType.hyper_deepsic.name:
+                # for the hypernetwork calculate the estimation of the channel
                 H_hat = ls_channel_estimation(mx_pilot, rx_pilot)
+            else:
+                # otherwise, no need to calculate the channel coefficients and snr, simply set to the number of users
+                H_hat = mx_pilot.shape[1]
             # ---------------------------------------------------------
             # detect data part after training on the pilot part
             detected_words = self.detector.forward(rx_data, H_hat, n_user=mx.shape[1])
