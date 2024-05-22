@@ -6,6 +6,7 @@ from python_code import DEVICE, conf
 from python_code.datasets.communications_blocks.modulator import BPSKModulator
 from python_code.detectors.detector_trainer import Detector
 from python_code.utils.constants import HIDDEN_SIZES_DICT, TRAINING_TYPES_DICT
+from python_code.utils.metrics import count_parameters
 
 
 class DeepSICTrainer(Detector):
@@ -68,3 +69,10 @@ class DeepSICTrainer(Detector):
                 probs_vec = self._calculate_posteriors(i + 1, probs_vec, rx, snrs_list)
             detected_words = self._symbols_from_prob(probs_vec)
             return detected_words
+
+    def count_parameters(self):
+        smallest_model = list(self.detector.values())[0][0]
+        largest_model = list(self.detector.values())[-1][0]
+        params_low = count_parameters(smallest_model)
+        params_high = count_parameters(largest_model)
+        return params_low, params_high

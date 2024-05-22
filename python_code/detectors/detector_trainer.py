@@ -62,3 +62,6 @@ class Detector(nn.Module):
         Every evaluater must have some forward pass for its _detector
         """
         pass
+
+    def count_parameters(self):
+        pass

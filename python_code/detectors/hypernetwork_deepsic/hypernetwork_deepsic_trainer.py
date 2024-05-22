@@ -12,6 +12,7 @@ from python_code.detectors.hypernetwork_deepsic.hyper_deepsic import HyperDeepSI
 from python_code.detectors.hypernetwork_deepsic.hypernetwork import Hypernetwork
 from python_code.detectors.hypernetwork_deepsic.user_embedder import UserEmbedder, USER_EMB_SIZE
 from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType, HIDDEN_SIZES_DICT, MAX_USERS, EPOCHS_DICT
+from python_code.utils.metrics import count_parameters
 
 EPOCHS = 10
 
@@ -98,3 +99,8 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
                     self.optimizer.zero_grad()
                     loss.backward()
                     self.optimizer.step()
+
+    def count_parameters(self):
+        params_low = count_parameters(self.user_embedder)
+        params_high = count_parameters(self.hypernetwork)
+        return params_low, params_high

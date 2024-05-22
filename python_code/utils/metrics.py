@@ -12,3 +12,6 @@ def calculate_error_rate(prediction: torch.Tensor, target: torch.Tensor) -> Tupl
     equal_bits = torch.eq(prediction, target).float()
     bits_acc = torch.mean(equal_bits).item()
     return 1 - bits_acc
+
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)

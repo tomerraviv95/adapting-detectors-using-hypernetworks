@@ -45,6 +45,7 @@ class Evaluator(object):
         :return: list of ber per timestep
         """
         print(f"Detecting using {str(self.detector)}")
+        print(self.detector.count_parameters())
         torch.cuda.empty_cache()
         ser_list, ber_list, ece_list = [], [], []
         # ---------------------------------------------------------

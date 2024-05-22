@@ -46,6 +46,7 @@ if __name__ == "__main__":
         {'detector_type': 'rec_deepsic', 'training_type': 'Online'},
         {'detector_type': 'hyper_deepsic', 'training_type': 'Joint'},
     ]
+    seeds = [2, 4, 6]
 
     # path for the saved figure
     current_day_time = datetime.now()
@@ -58,10 +59,14 @@ if __name__ == "__main__":
     for params in params_list:
         for key, value in params.items():
             conf.set_value(key, value)
-        evaluator = Evaluator()
-        metrics_output: MetricOutput = evaluator.evaluate()
-        method_name = evaluator.detector.__str__()
-        values = np.cumsum(np.array(metrics_output.ser_list)) / len(metrics_output.ser_list)
+        values = 0
+        for seed in seeds:
+            conf.set_value('seed', seed)
+            evaluator = Evaluator()
+            metrics_output: MetricOutput = evaluator.evaluate()
+            method_name = evaluator.detector.__str__()
+            values += np.cumsum(np.array(metrics_output.ser_list)) / len(metrics_output.ser_list)
+        values /= len(seeds)
         plt.plot(range(len(metrics_output.ser_list)), values, label=method_name, color=COLORS_DICT[method_name],
                  markevery=20, marker=MARKERS_DICT[method_name], markersize=11,
                  linestyle=LINESTYLES_DICT[method_name], linewidth=2.2)

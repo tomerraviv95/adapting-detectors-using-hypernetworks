@@ -1,7 +1,7 @@
 # general settings
 seed: 3 # run seed
 n_ant: 12 # number of received signals
-detector_type: 'rec_deepsic' # ['seq_deepsic','rec_deepsic','hyper_deepsic']
+detector_type: 'hyper_deepsic' # ['seq_deepsic','rec_deepsic','hyper_deepsic']
 training_type: 'Joint' # ['Joint','Online']
 
 # train settings
