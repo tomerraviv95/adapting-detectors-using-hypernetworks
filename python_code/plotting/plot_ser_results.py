@@ -45,9 +45,8 @@ if __name__ == "__main__":
         {'detector_type': 'rec_deepsic', 'training_type': 'Joint'},
         {'detector_type': 'rec_deepsic', 'training_type': 'Online'},
         {'detector_type': 'hyper_deepsic', 'training_type': 'Joint'},
-        {'detector_type': 'rnn_hyper_deepsic', 'training_type': 'Joint'},
     ]
-    seeds = [2, 4, 6]
+    seeds = [1, 2, 3]
 
     # path for the saved figure
     current_day_time = datetime.now()

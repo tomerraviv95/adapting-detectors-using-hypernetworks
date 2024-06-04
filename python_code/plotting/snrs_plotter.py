@@ -1,15 +1,14 @@
 from matplotlib import pyplot as plt
 
 from python_code.evaluator import Evaluator
-from python_code.utils.constants import Phase
 
 if __name__ == "__main__":
     evaluator = Evaluator()
-    PLOT_TRAIN = True
+    PLOT_TRAIN = False
     if PLOT_TRAIN:
-        _, _, snrs_list = evaluator.train_channel_dataset.__getitem__(phase=Phase.TRAIN)
+        _, _, snrs_list = evaluator.train_channel_dataset.__getitem__()
     else:
-        _, _, snrs_list = evaluator.test_channel_dataset.__getitem__(phase=Phase.TEST)
+        _, _, snrs_list = evaluator.test_channel_dataset.__getitem__()
 
     plt.figure()
 
