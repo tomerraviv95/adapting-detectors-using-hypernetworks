@@ -3,17 +3,43 @@ import numpy as np
 from python_code import conf
 from python_code.utils.constants import Phase
 
-SNR = 5
+TRAIN_SNR = 4
 COEF = 3
-# per user: (Min SNR, Max SNR, Number of blocks between peaks)
-TRAIN_SNR_PER_USER = [(SNR, COEF * SNR, 5), (SNR, COEF * SNR, 10), (SNR, COEF * SNR, 15), (SNR, COEF * SNR, 20),
-                      (SNR, COEF * SNR, 25), (SNR, COEF * SNR, 30), (SNR, COEF * SNR, 35), (SNR, COEF * SNR, 40),
-                      (SNR, COEF * SNR, 13), (SNR, COEF * SNR, 25), (SNR, COEF * SNR, 7), (SNR, COEF * SNR, 21) ]
-SNR2 = 7
-COEF = 2
-TEST_SNR_PER_USER = [(SNR2, COEF * SNR2, 3), (SNR2, COEF * SNR2, 10), (SNR2, COEF * SNR2, 7), (SNR2, COEF * SNR2, 12),
-                     (SNR2, COEF * SNR2, 15), (SNR2, COEF * SNR2, 22), (SNR2, COEF * SNR2, 23), (SNR2, COEF * SNR2, 14),
-                     (SNR2, COEF * SNR2, 25), (SNR2, COEF * SNR2, 18), (SNR2, COEF * SNR2, 30), (SNR2, COEF * SNR2, 11)]
+# per user: (Min TRAIN_SNR, Max TRAIN_SNR, Number of blocks between peaks)
+TRAIN_SNR_PER_USER = [(TRAIN_SNR, COEF * TRAIN_SNR, 100), (TRAIN_SNR, COEF * TRAIN_SNR, 99),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 95), (TRAIN_SNR, COEF * TRAIN_SNR, 95),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 96), (TRAIN_SNR, COEF * TRAIN_SNR, 95),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 95), (TRAIN_SNR, COEF * TRAIN_SNR, 8),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 9), (TRAIN_SNR, COEF * TRAIN_SNR, 10),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 11), (TRAIN_SNR, COEF * TRAIN_SNR, 12),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 13), (TRAIN_SNR, COEF * TRAIN_SNR, 14),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 15), (TRAIN_SNR, COEF * TRAIN_SNR, 16),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 17), (TRAIN_SNR, COEF * TRAIN_SNR, 18),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 19), (TRAIN_SNR, COEF * TRAIN_SNR, 20),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 21), (TRAIN_SNR, COEF * TRAIN_SNR, 22),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 23), (TRAIN_SNR, COEF * TRAIN_SNR, 24),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 25), (TRAIN_SNR, COEF * TRAIN_SNR, 70),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 60), (TRAIN_SNR, COEF * TRAIN_SNR, 50),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 40), (TRAIN_SNR, COEF * TRAIN_SNR, 30),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 20), (TRAIN_SNR, COEF * TRAIN_SNR, 10)]
+TEST_SNR = 6
+COEF = 1.5
+TEST_SNR_PER_USER = [(TEST_SNR, COEF * TEST_SNR, 5), (TEST_SNR, COEF * TEST_SNR, 10),
+                     (TEST_SNR, COEF * TEST_SNR, 15), (TEST_SNR, COEF * TEST_SNR, 20),
+                     (TEST_SNR, COEF * TEST_SNR, 25), (TEST_SNR, COEF * TEST_SNR, 30),
+                     (TEST_SNR, COEF * TEST_SNR, 35), (TEST_SNR, COEF * TEST_SNR, 40),
+                     (TEST_SNR, COEF * TEST_SNR, 45), (TEST_SNR, COEF * TEST_SNR, 50),
+                     (TEST_SNR, COEF * TEST_SNR, 55), (TEST_SNR, COEF * TEST_SNR, 60),
+                     (TEST_SNR, COEF * TEST_SNR, 65), (TEST_SNR, COEF * TEST_SNR, 70),
+                     (TEST_SNR, COEF * TEST_SNR, 75), (TEST_SNR, COEF * TEST_SNR, 80),
+                     (TEST_SNR, COEF * TEST_SNR, 85), (TEST_SNR, COEF * TEST_SNR, 90),
+                     (TEST_SNR, COEF * TEST_SNR, 95), (TEST_SNR, COEF * TEST_SNR, 100),
+                     (TEST_SNR, COEF * TEST_SNR, 105), (TEST_SNR, COEF * TEST_SNR, 110),
+                     (TEST_SNR, COEF * TEST_SNR, 115), (TEST_SNR, COEF * TEST_SNR, 120),
+                     (TEST_SNR, COEF * TEST_SNR, 125), (TEST_SNR, COEF * TEST_SNR, 130),
+                     (TEST_SNR, COEF * TEST_SNR, 135), (TEST_SNR, COEF * TEST_SNR, 140),
+                     (TEST_SNR, COEF * TEST_SNR, 145), (TEST_SNR, COEF * TEST_SNR, 150),
+                     (TEST_SNR, COEF * TEST_SNR, 155), (TEST_SNR, COEF * TEST_SNR, 160)]
 
 SNR_PER_USER_DICT = {Phase.TRAIN: TRAIN_SNR_PER_USER, Phase.TEST: TEST_SNR_PER_USER}
 
@@ -59,14 +85,9 @@ class SEDChannel:
         snrs_mat = np.eye(h.shape[0])
         for i in range(len(snrs_mat)):
             snrs_mat[i, i] = snrs[i]
-        # Users X antennas matrix. Scale each row by the SNR of the given user.
+        # Users X antennas matrix. Scale each row by the TRAIN_SNR of the given user.
         snrs_scaled_h = np.matmul(snrs_mat, h)
         conv = np.matmul(s, snrs_scaled_h)
         w = np.random.randn(s.shape[0], conf.n_ant)
         y = conv + w
         return y
-
-    @staticmethod
-    def _compute_channel_signal_convolution(h: np.ndarray, s: np.ndarray) -> np.ndarray:
-        conv = np.matmul(h, s)
-        return conv

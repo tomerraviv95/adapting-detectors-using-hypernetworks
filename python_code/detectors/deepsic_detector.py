@@ -24,6 +24,6 @@ class DeepSICDetector(nn.Module):
         self.fc2 = nn.Linear(hidden_size, 2)
 
     def forward(self, rx: torch.Tensor) -> torch.Tensor:
-        mid = self.activation(self.fc1(rx))
-        out = self.fc2(mid)
+        x = self.activation(self.fc1(rx))
+        out = self.fc2(x)
         return out

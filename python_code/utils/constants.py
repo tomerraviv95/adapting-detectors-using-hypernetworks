@@ -19,7 +19,8 @@ class TrainingType(Enum):
 
 
 TRAINING_TYPES_DICT = {'Joint': TrainingType.Joint, 'Online': TrainingType.Online}
-EPOCHS_DICT = {'Joint': 50, 'Online': 25}
-HIDDEN_SIZES_DICT = {TrainingType.Joint: 64, TrainingType.Online: 64}
+HIDDEN_SIZES_DICT = {TrainingType.Joint: 64, TrainingType.Online: 16}
+EPOCHS = 50
 
 MAX_USERS = 32
+TRAINING_SYMBOLS = 10

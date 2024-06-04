@@ -8,7 +8,7 @@ from python_code import conf
 from python_code.datasets.channel_dataset import ChannelModelDataset
 from python_code.detectors import DETECTORS_TYPE_DICT
 from python_code.utils.channel_estimate import ls_channel_estimation
-from python_code.utils.constants import Phase, TrainingType, DetectorType
+from python_code.utils.constants import Phase, TrainingType, DetectorType, MAX_USERS, TRAINING_SYMBOLS
 from python_code.utils.metrics import calculate_error_rate
 
 random.seed(conf.seed)
@@ -30,7 +30,7 @@ class Evaluator(object):
     def __init__(self):
         self.detector = DETECTORS_TYPE_DICT[conf.detector_type]()
         self.train_channel_dataset = ChannelModelDataset(block_length=conf.train_block_length,
-                                                         blocks_num=conf.train_blocks_num,
+                                                         blocks_num=TRAINING_SYMBOLS * (MAX_USERS - 1),
                                                          pilots_length=1, phase=Phase.TRAIN)
         self.test_channel_dataset = ChannelModelDataset(block_length=conf.test_block_length,
                                                         blocks_num=conf.test_blocks_num,
@@ -50,8 +50,8 @@ class Evaluator(object):
         ser_list, ber_list, ece_list = [], [], []
         # ---------------------------------------------------------
         # Joint training - as in the config "training_type" option
-        message_words, received_words = self.train_channel_dataset.__getitem__()
         if self.detector.training_type == TrainingType.Joint:
+            message_words, received_words = self.train_channel_dataset.__getitem__()
             H_hats = [ls_channel_estimation(mx_pilots, rx_pilots) for mx_pilots, rx_pilots in
                       zip(message_words, received_words)]
             self.detector.train(message_words, received_words, H_hats)

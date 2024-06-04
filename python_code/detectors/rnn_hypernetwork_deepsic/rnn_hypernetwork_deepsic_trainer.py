@@ -11,7 +11,7 @@ from python_code.detectors.deepsic_trainer import DeepSICTrainer
 from python_code.detectors.rnn_hypernetwork_deepsic.hyper_deepsic import HyperDeepSICDetector
 from python_code.detectors.rnn_hypernetwork_deepsic.hypernetwork import Hypernetwork
 from python_code.detectors.rnn_hypernetwork_deepsic.user_embedder import UserEmbedder, USER_EMB_SIZE
-from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType, HIDDEN_SIZES_DICT, MAX_USERS, EPOCHS_DICT
+from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType, HIDDEN_SIZES_DICT, MAX_USERS, EPOCHS
 from python_code.utils.metrics import count_parameters
 
 
@@ -75,9 +75,8 @@ class RNNHypernetworkDeepSICTrainer(DeepSICTrainer):
         total_parameters = chain(total_parameters, self.this_user_vec.parameters())
         total_parameters = chain(total_parameters, self.no_user_vec.parameters())
         self.optimizer = torch.optim.Adam(total_parameters, lr=self.lr)
-        epochs = EPOCHS_DICT[conf.training_type]
         BATCH_SIZE = 16
-        for epoch in range(epochs):
+        for epoch in range(EPOCHS):
             start_loc = np.random.choice(len(hs) - BATCH_SIZE + 1, 1)[0]
             curr_batch = range(start_loc, start_loc + BATCH_SIZE)
             prev_users = 0

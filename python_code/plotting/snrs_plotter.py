@@ -16,7 +16,7 @@ if __name__ == "__main__":
     for i in range(len(snrs_list[0])):
         all_user_snrs = [snrs[i] for snrs in snrs_list]
         plt.plot(all_user_snrs, label=f'User {i}')
-        plt.ylabel(r'SNR [dB]', fontsize=20)
+        plt.ylabel(r'TRAIN_SNR [dB]', fontsize=20)
         plt.xlabel(r'Block Index', fontsize=20)
         plt.grid(True, which='both')
     plt.legend(loc='upper left', prop={'size': 15})

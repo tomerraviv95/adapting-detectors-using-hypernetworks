@@ -7,7 +7,7 @@ from torch import nn
 from python_code import DEVICE, conf
 from python_code.detectors.deepsic_detector import DeepSICDetector
 from python_code.detectors.deepsic_trainer import DeepSICTrainer
-from python_code.utils.constants import TRAINING_TYPES_DICT, EPOCHS_DICT, MAX_USERS
+from python_code.utils.constants import TRAINING_TYPES_DICT, MAX_USERS, EPOCHS
 
 
 class RecDeepSICTrainer(DeepSICTrainer):
@@ -21,7 +21,7 @@ class RecDeepSICTrainer(DeepSICTrainer):
     def _initialize_detector(self):
         # populate 1D list for Storing the DeepSIC Networks
         self.detector = {user: [DeepSICDetector(user, self.hidden_size).to(DEVICE) for _ in range(user)] for user in
-                         range(2, MAX_USERS)}
+                         range(2, MAX_USERS + 1)}
 
     def _soft_symbols_from_probs(self, input: torch.Tensor, user: int, hs: int, i: int = None) -> torch.Tensor:
         return self.softmax(self.detector[hs][user](input.float()))
@@ -33,10 +33,9 @@ class RecDeepSICTrainer(DeepSICTrainer):
         self.optimizer = torch.optim.Adam(single_model.parameters(), lr=self.lr)
         self.criterion = torch.nn.CrossEntropyLoss()
         single_model = single_model.to(DEVICE)
-        epochs = EPOCHS_DICT[conf.training_type]
         mx = torch.cat(mx)
         rx = torch.cat(rx)
-        for _ in range(epochs):
+        for _ in range(EPOCHS):
             soft_estimation = single_model(rx.float())
             self._run_train_loop(soft_estimation, mx)
 
