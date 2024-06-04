@@ -22,5 +22,5 @@ TRAINING_TYPES_DICT = {'Joint': TrainingType.Joint, 'Online': TrainingType.Onlin
 HIDDEN_SIZES_DICT = {TrainingType.Joint: 64, TrainingType.Online: 16}
 EPOCHS = 50
 
-MAX_USERS = 32
+MAX_USERS = 8
 TRAINING_SYMBOLS = 10

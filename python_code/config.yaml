@@ -1,8 +1,8 @@
 # general settings
 seed: 4 # run seed
 n_ant: 12 # number of received signals
-detector_type: 'hyper_deepsic' # ['rec_deepsic','hyper_deepsic','rnn_hyper_deepsic']
-training_type: 'Joint' # ['Joint','Online']
+detector_type: 'rec_deepsic' # ['rec_deepsic','hyper_deepsic']
+training_type: 'Online' # ['Joint','Online']
 
 # train settings
 train_block_length: 100 # coherence block time, total size of pilot + data. values: int.

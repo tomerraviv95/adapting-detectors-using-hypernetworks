@@ -1,9 +1,11 @@
 from python_code.utils.constants import Phase, MAX_USERS, TRAINING_SYMBOLS
 
-NUMBER_OF_USERS_DICT = {Phase.TRAIN: {(i, j): user for i, j, user in zip(list(range(0, TRAINING_SYMBOLS * MAX_USERS, TRAINING_SYMBOLS)),
-                                                                         list(range(TRAINING_SYMBOLS, TRAINING_SYMBOLS * (MAX_USERS + 1), TRAINING_SYMBOLS)),
-                                                                         range(2, MAX_USERS + 1))},
-                        Phase.TEST: {(0, 20): 6, (20, 40): 7, (40, 60): 8, (60, 80): 9, (80, 100): 10}}
+NUMBER_OF_USERS_DICT = {
+    Phase.TRAIN: {(i, j): user for i, j, user in zip(list(range(0, TRAINING_SYMBOLS * MAX_USERS, TRAINING_SYMBOLS)),
+                                                     list(range(TRAINING_SYMBOLS, TRAINING_SYMBOLS * (MAX_USERS + 1),
+                                                                TRAINING_SYMBOLS)),
+                                                     range(2, MAX_USERS + 1))},
+    Phase.TEST: {(0, 20): 3, (20, 40): 4, (40, 60): 7, (60, 80): 6, (80, 100): 5}}
 
 
 class UsersNetwork:

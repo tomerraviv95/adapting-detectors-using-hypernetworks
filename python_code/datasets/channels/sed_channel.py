@@ -6,12 +6,12 @@ from python_code.utils.constants import Phase
 TRAIN_SNR = 4
 COEF = 3
 # per user: (Min TRAIN_SNR, Max TRAIN_SNR, Number of blocks between peaks)
-TRAIN_SNR_PER_USER = [(TRAIN_SNR, COEF * TRAIN_SNR, 100), (TRAIN_SNR, COEF * TRAIN_SNR, 99),
-                      (TRAIN_SNR, COEF * TRAIN_SNR, 95), (TRAIN_SNR, COEF * TRAIN_SNR, 95),
-                      (TRAIN_SNR, COEF * TRAIN_SNR, 96), (TRAIN_SNR, COEF * TRAIN_SNR, 95),
-                      (TRAIN_SNR, COEF * TRAIN_SNR, 95), (TRAIN_SNR, COEF * TRAIN_SNR, 8),
-                      (TRAIN_SNR, COEF * TRAIN_SNR, 9), (TRAIN_SNR, COEF * TRAIN_SNR, 10),
-                      (TRAIN_SNR, COEF * TRAIN_SNR, 11), (TRAIN_SNR, COEF * TRAIN_SNR, 12),
+TRAIN_SNR_PER_USER = [(TRAIN_SNR, COEF * TRAIN_SNR, 10), (TRAIN_SNR, COEF * TRAIN_SNR, 14),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 15), (TRAIN_SNR, COEF * TRAIN_SNR, 22),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 7), (TRAIN_SNR, COEF * TRAIN_SNR, 88),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 21), (TRAIN_SNR, COEF * TRAIN_SNR, 33),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 48), (TRAIN_SNR, COEF * TRAIN_SNR, 12),
+                      (TRAIN_SNR, COEF * TRAIN_SNR, 36), (TRAIN_SNR, COEF * TRAIN_SNR, 100),
                       (TRAIN_SNR, COEF * TRAIN_SNR, 13), (TRAIN_SNR, COEF * TRAIN_SNR, 14),
                       (TRAIN_SNR, COEF * TRAIN_SNR, 15), (TRAIN_SNR, COEF * TRAIN_SNR, 16),
                       (TRAIN_SNR, COEF * TRAIN_SNR, 17), (TRAIN_SNR, COEF * TRAIN_SNR, 18),

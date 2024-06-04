@@ -20,7 +20,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
 
     def __init__(self):
         super().__init__()
-        self.lr = 5e-4
+        self.lr = 1e-3
         self.train_context_embedding = []
         self.test_context_embedding = []
         if TRAINING_TYPES_DICT[conf.training_type] == TrainingType.Online:
@@ -57,7 +57,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         context_embedding = []
         for j in range(MAX_USERS):
             if j in range(H.shape[0]):
-                if user != j:
+                if j != user:
                     context_embedding.append(user_embeddings[j].reshape(1, -1))
                 else:
                     context_embedding.append(self.this_user_vec(ind))
