@@ -10,9 +10,8 @@ from python_code.detectors.deepsic_detector import DeepSICDetector
 from python_code.detectors.deepsic_trainer import DeepSICTrainer
 from python_code.detectors.hypernetwork_deepsic.hyper_deepsic import HyperDeepSICDetector
 from python_code.detectors.hypernetwork_deepsic.hypernetwork import Hypernetwork
-from python_code.detectors.hypernetwork_deepsic.user_embedder import UserEmbedder, USER_EMB_SIZE
 from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType, HIDDEN_SIZES_DICT, MAX_USERS, \
-    TRAINING_SYMBOLS, EPOCHS
+    TRAINING_SYMBOLS, EPOCHS, USER_EMB_SIZE
 from python_code.utils.metrics import count_parameters
 
 
@@ -30,7 +29,6 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         return TRAINING_TYPES_DICT[conf.training_type].name + ' Hypernetwork-based DeepSIC'
 
     def _initialize_detector(self):
-        self.user_embedder = UserEmbedder().to(DEVICE)
         self.hidden_size = HIDDEN_SIZES_DICT[TrainingType.Online]
         self.base_deepsic = DeepSICDetector(MAX_USERS, self.hidden_size)
         self.no_user_vec = Embedding(1, USER_EMB_SIZE).to(DEVICE)
@@ -52,7 +50,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         return self.softmax(deepsic_output)
 
     def _get_context_embedding(self, H: torch.Tensor, user: int) -> torch.Tensor:
-        user_embeddings = self.user_embedder(torch.Tensor(H).to(DEVICE))
+        user_embeddings = H
         ind = torch.LongTensor([0]).to(DEVICE)
         context_embedding = []
         for j in range(MAX_USERS):
@@ -68,8 +66,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
 
     def train(self, message_words: torch.Tensor, received_words: torch.Tensor, hs: List[List[float]]):
         self.criterion = torch.nn.CrossEntropyLoss()
-        total_parameters = self.user_embedder.parameters()
-        total_parameters = chain(total_parameters, self.hypernetwork.parameters())
+        total_parameters = self.hypernetwork.parameters()
         total_parameters = chain(total_parameters, self.this_user_vec.parameters())
         total_parameters = chain(total_parameters, self.no_user_vec.parameters())
         self.optimizer = torch.optim.Adam(total_parameters, lr=self.lr)
@@ -79,7 +76,8 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
             for i in curr_batch:
                 n_users = hs[i].shape[0]
                 for user in range(n_users):
-                    mx, rx, h = message_words[i], received_words[i], hs[i]
+                    mx, rx = message_words[i], received_words[i]
+                    h = hs[i]
                     # Obtaining the DeepSIC networks for each user-symbol and the i-th iteration
                     probs_vec = torch.rand(mx.shape).to(DEVICE)
                     mx_all, rx_all = self._prepare_data_for_training(mx, rx, probs_vec)
@@ -100,6 +98,5 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
                     self.optimizer.step()
 
     def count_parameters(self):
-        params_low = count_parameters(self.user_embedder)
         params_high = count_parameters(self.hypernetwork)
-        return params_low, params_high
+        return 0, params_high

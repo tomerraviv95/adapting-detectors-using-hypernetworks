@@ -9,7 +9,7 @@ USER_EMB_SIZE = 8
 class UserEmbedder(nn.Module):
     def __init__(self):
         super(UserEmbedder, self).__init__()
-        self.fc_embedding = nn.Linear(conf.n_ant + 1, USER_EMB_SIZE)
+        self.fc_embedding = nn.Linear(conf.n_ant, USER_EMB_SIZE)
         self.fc_embedding2 = nn.Linear(USER_EMB_SIZE, USER_EMB_SIZE)
         self.activation = nn.ReLU()
 

@@ -14,16 +14,14 @@ class Hypernetwork(nn.Module):
         self.activation = nn.ReLU()
         self.embedding = nn.Linear(MAX_USERS * input_size, EMB)
         self.embedding2 = nn.Linear(EMB, EMB // 2)
-        self.fc_output = nn.Linear(EMB // 2, sum(parameters_num))
-        self.parameters_num = parameters_num
+        self.fc_outs = nn.ModuleList(
+            [nn.Linear(EMB // 2, cur_params) for cur_params in parameters_num])
 
     def forward(self, rx: torch.Tensor) -> List[torch.Tensor]:
         embedding1 = self.activation(self.embedding(rx))
         embedding2 = self.activation(self.embedding2(embedding1))
-        out = self.fc_output(embedding2)
         fc_weights = []
-        start = 0
-        for param_num in self.parameters_num:
-            fc_weights.append(out[:, start:start + param_num])
-            start += param_num
+        for i in range(len(self.fc_outs)):
+            fc_weight = self.fc_outs[i](embedding2)
+            fc_weights.append(fc_weight)
         return fc_weights

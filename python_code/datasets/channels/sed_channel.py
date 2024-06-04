@@ -4,7 +4,7 @@ from python_code import conf
 from python_code.utils.constants import Phase
 
 TRAIN_SNR = 4
-COEF = 3
+COEF = 4
 # per user: (Min TRAIN_SNR, Max TRAIN_SNR, Number of blocks between peaks)
 TRAIN_SNR_PER_USER = [(TRAIN_SNR, COEF * TRAIN_SNR, 10), (TRAIN_SNR, COEF * TRAIN_SNR, 14),
                       (TRAIN_SNR, COEF * TRAIN_SNR, 15), (TRAIN_SNR, COEF * TRAIN_SNR, 22),
@@ -22,8 +22,8 @@ TRAIN_SNR_PER_USER = [(TRAIN_SNR, COEF * TRAIN_SNR, 10), (TRAIN_SNR, COEF * TRAI
                       (TRAIN_SNR, COEF * TRAIN_SNR, 60), (TRAIN_SNR, COEF * TRAIN_SNR, 50),
                       (TRAIN_SNR, COEF * TRAIN_SNR, 40), (TRAIN_SNR, COEF * TRAIN_SNR, 30),
                       (TRAIN_SNR, COEF * TRAIN_SNR, 20), (TRAIN_SNR, COEF * TRAIN_SNR, 10)]
-TEST_SNR = 6
-COEF = 1.5
+TEST_SNR = 10
+COEF = 1.2
 TEST_SNR_PER_USER = [(TEST_SNR, COEF * TEST_SNR, 5), (TEST_SNR, COEF * TEST_SNR, 10),
                      (TEST_SNR, COEF * TEST_SNR, 15), (TEST_SNR, COEF * TEST_SNR, 20),
                      (TEST_SNR, COEF * TEST_SNR, 25), (TEST_SNR, COEF * TEST_SNR, 30),

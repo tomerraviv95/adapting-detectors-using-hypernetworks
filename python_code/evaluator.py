@@ -50,11 +50,10 @@ class Evaluator(object):
         ser_list, ber_list, ece_list = [], [], []
         # ---------------------------------------------------------
         # Joint training - as in the config "training_type" option
-        if self.detector.training_type == TrainingType.Joint:
-            message_words, received_words = self.train_channel_dataset.__getitem__()
-            H_hats = [ls_channel_estimation(mx_pilots, rx_pilots) for mx_pilots, rx_pilots in
-                      zip(message_words, received_words)]
-            self.detector.train(message_words, received_words, H_hats)
+        message_words, received_words = self.train_channel_dataset.__getitem__()
+        H_hats = [ls_channel_estimation(mx_pilots, rx_pilots) for mx_pilots, rx_pilots in
+                  zip(message_words, received_words)]
+        self.detector.train(message_words, received_words, H_hats)
         # ---------------------------------------------------------
         message_words, received_words = self.test_channel_dataset.__getitem__()
         # detect sequentially

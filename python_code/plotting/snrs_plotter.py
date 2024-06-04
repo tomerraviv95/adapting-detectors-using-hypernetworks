@@ -1,5 +1,6 @@
 import collections
 
+import matplotlib as mpl
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -7,6 +8,19 @@ from python_code import conf
 from python_code.datasets.channels.sed_channel import SEDChannel
 from python_code.evaluator import Evaluator
 from python_code.utils.constants import Phase
+
+mpl.rcParams['xtick.labelsize'] = 24
+mpl.rcParams['ytick.labelsize'] = 24
+mpl.rcParams['font.size'] = 15
+mpl.rcParams['figure.autolayout'] = True
+mpl.rcParams['figure.figsize'] = [9.5, 6.45]
+mpl.rcParams['axes.titlesize'] = 28
+mpl.rcParams['axes.labelsize'] = 28
+mpl.rcParams['lines.linewidth'] = 2
+mpl.rcParams['lines.markersize'] = 8
+mpl.rcParams['legend.fontsize'] = 20
+mpl.rcParams['mathtext.fontset'] = 'stix'
+mpl.rcParams['font.family'] = 'STIXGeneral'
 
 if __name__ == "__main__":
     evaluator = Evaluator()
