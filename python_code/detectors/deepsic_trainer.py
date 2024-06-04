@@ -13,8 +13,9 @@ class DeepSICTrainer(Detector):
 
     def __init__(self):
         self.lr = 5e-3
-        self.iterations = 1
+        self.iterations = 3
         self.hidden_size = HIDDEN_SIZES_DICT[TRAINING_TYPES_DICT[conf.training_type]]
+        self.prev_users = 0
         super().__init__()
 
     def __str__(self):
@@ -64,11 +65,17 @@ class DeepSICTrainer(Detector):
     def forward(self, rx: torch.Tensor, snrs_list: List[List[float]] = None, n_user=None) -> torch.Tensor:
         with torch.no_grad():
             # detect and decode
+            # initialize the states of new users entering the network
+            self.adapt_network(n_user)
             probs_vec = 0.5 * torch.ones([rx.shape[0], n_user]).to(DEVICE).float()
             for i in range(self.iterations):
                 probs_vec = self._calculate_posteriors(i + 1, probs_vec, rx, snrs_list)
             detected_words = self._symbols_from_prob(probs_vec)
+            self.prev_users = n_user
             return detected_words
+
+    def adapt_network(self, n_user: int):
+        pass
 
     def count_parameters(self):
         smallest_model = list(self.detector.values())[0][0]

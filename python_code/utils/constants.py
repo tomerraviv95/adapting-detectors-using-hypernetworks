@@ -5,6 +5,7 @@ class DetectorType(Enum):
     seq_deepsic = 'seq_deepsic'
     rec_deepsic = 'rec_deepsic'
     hyper_deepsic = 'hyper_deepsic'
+    rnn_hyper_deepsic = 'rnn_hyper_deepsic'
 
 
 class Phase(Enum):

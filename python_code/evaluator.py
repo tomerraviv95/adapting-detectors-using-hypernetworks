@@ -71,7 +71,7 @@ class Evaluator(object):
                 # run Online training on the pilots part
                 self.detector.train([mx_pilot], [rx_pilot])
 
-            if conf.detector_type == DetectorType.hyper_deepsic.name:
+            if conf.detector_type in [DetectorType.hyper_deepsic.name, DetectorType.rnn_hyper_deepsic.name]:
                 # for the hypernetwork calculate the estimation of the channel
                 H_hat = ls_channel_estimation(mx_pilot, rx_pilot)
             else:

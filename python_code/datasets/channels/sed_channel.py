@@ -3,13 +3,13 @@ import numpy as np
 from python_code import conf
 from python_code.utils.constants import Phase
 
-SNR = 4
-COEF = 2
+SNR = 5
+COEF = 3
 # per user: (Min SNR, Max SNR, Number of blocks between peaks)
 TRAIN_SNR_PER_USER = [(SNR, COEF * SNR, 5), (SNR, COEF * SNR, 10), (SNR, COEF * SNR, 15), (SNR, COEF * SNR, 20),
                       (SNR, COEF * SNR, 25), (SNR, COEF * SNR, 30), (SNR, COEF * SNR, 35), (SNR, COEF * SNR, 40),
                       (SNR, COEF * SNR, 13), (SNR, COEF * SNR, 25), (SNR, COEF * SNR, 7), (SNR, COEF * SNR, 21) ]
-SNR2 = 4
+SNR2 = 7
 COEF = 2
 TEST_SNR_PER_USER = [(SNR2, COEF * SNR2, 3), (SNR2, COEF * SNR2, 10), (SNR2, COEF * SNR2, 7), (SNR2, COEF * SNR2, 12),
                      (SNR2, COEF * SNR2, 15), (SNR2, COEF * SNR2, 22), (SNR2, COEF * SNR2, 23), (SNR2, COEF * SNR2, 14),

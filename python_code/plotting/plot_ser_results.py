@@ -26,25 +26,26 @@ COLORS_DICT = {'Joint Hypernetwork-based DeepSIC': 'red',
                'Joint Recurrent DeepSIC': 'orange',
                'Online Recurrent DeepSIC': 'blue',
                'Online Sequential DeepSIC': 'green',
-               'Joint Sequential DeepSIC': 'black'}
+               'Joint RNN Hypernetwork-based DeepSIC': 'black'}
 
 MARKERS_DICT = {'Joint Hypernetwork-based DeepSIC': 'd',
                 'Joint Recurrent DeepSIC': 'd',
                 'Online Recurrent DeepSIC': 'x',
                 'Online Sequential DeepSIC': 'x',
-                'Joint Sequential DeepSIC': 'o'}
+                'Joint RNN Hypernetwork-based DeepSIC': 'o'}
 
 LINESTYLES_DICT = {'Joint Hypernetwork-based DeepSIC': 'solid',
                    'Joint Recurrent DeepSIC': 'dotted',
                    'Online Recurrent DeepSIC': 'solid',
                    'Online Sequential DeepSIC': 'dotted',
-                   'Joint Sequential DeepSIC': 'solid'}
+                   'Joint RNN Hypernetwork-based DeepSIC': 'solid'}
 
 if __name__ == "__main__":
     params_list = [
         {'detector_type': 'rec_deepsic', 'training_type': 'Joint'},
         {'detector_type': 'rec_deepsic', 'training_type': 'Online'},
         {'detector_type': 'hyper_deepsic', 'training_type': 'Joint'},
+        {'detector_type': 'rnn_hyper_deepsic', 'training_type': 'Joint'},
     ]
     seeds = [2, 4, 6]
 
