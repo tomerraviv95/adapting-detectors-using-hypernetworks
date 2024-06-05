@@ -11,14 +11,14 @@ from python_code.utils.constants import Phase
 
 mpl.rcParams['xtick.labelsize'] = 24
 mpl.rcParams['ytick.labelsize'] = 24
-mpl.rcParams['font.size'] = 15
+mpl.rcParams['font.size'] = 16
 mpl.rcParams['figure.autolayout'] = True
 mpl.rcParams['figure.figsize'] = [9.5, 6.45]
 mpl.rcParams['axes.titlesize'] = 28
 mpl.rcParams['axes.labelsize'] = 28
 mpl.rcParams['lines.linewidth'] = 2
 mpl.rcParams['lines.markersize'] = 8
-mpl.rcParams['legend.fontsize'] = 20
+mpl.rcParams['legend.fontsize'] = 12
 mpl.rcParams['mathtext.fontset'] = 'stix'
 mpl.rcParams['font.family'] = 'STIXGeneral'
 
@@ -42,5 +42,5 @@ if __name__ == "__main__":
         plt.ylabel(r'SNR [dB]', fontsize=20)
         plt.xlabel(r'Block Index', fontsize=20)
         plt.grid(True, which='both')
-    plt.legend(loc='upper left', prop={'size': 15})
+    plt.legend(loc='upper left')
     plt.show()

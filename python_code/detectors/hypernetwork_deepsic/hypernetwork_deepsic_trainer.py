@@ -10,7 +10,6 @@ from python_code.detectors.deepsic_detector import DeepSICDetector
 from python_code.detectors.deepsic_trainer import DeepSICTrainer
 from python_code.detectors.hypernetwork_deepsic.hyper_deepsic import HyperDeepSICDetector
 from python_code.detectors.hypernetwork_deepsic.hypernetwork import Hypernetwork
-from python_code.detectors.hypernetwork_deepsic.user_embedder import UserEmbedder
 from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType, HIDDEN_SIZES_DICT, MAX_USERS, \
     EPOCHS, USER_EMB_SIZE
 from python_code.utils.metrics import count_parameters
@@ -34,7 +33,6 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         self.base_deepsic = DeepSICDetector(MAX_USERS, self.hidden_size)
         self.no_user_vec = Embedding(1, USER_EMB_SIZE).to(DEVICE)
         self.this_user_vec = Embedding(1, USER_EMB_SIZE).to(DEVICE)
-        self.user_embedder = UserEmbedder().to(DEVICE)
         max_parameters = [param.numel() for param in self.base_deepsic.parameters()]
         self.hypernetwork = Hypernetwork(USER_EMB_SIZE, max_parameters).to(DEVICE)
         self.hyper_deepsic = HyperDeepSICDetector([param.size() for param in self.base_deepsic.parameters()])
@@ -53,12 +51,11 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
 
     def _get_context_embedding(self, h: torch.Tensor, user: int) -> torch.Tensor:
         ind = torch.LongTensor([0]).to(DEVICE)
-        embedding = (h)
         context_embedding = []
         for j in range(MAX_USERS):
             if j in range(h.shape[0]):
                 if j != user:
-                    context_embedding.append(embedding[j].reshape(1, -1))
+                    context_embedding.append(h[j].reshape(1, -1))
                 else:
                     context_embedding.append(self.this_user_vec(ind))
             else:
@@ -71,7 +68,6 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         total_parameters = self.hypernetwork.parameters()
         total_parameters = chain(total_parameters, self.this_user_vec.parameters())
         total_parameters = chain(total_parameters, self.no_user_vec.parameters())
-        total_parameters = chain(total_parameters, self.user_embedder.parameters())
         self.optimizer = torch.optim.Adam(total_parameters, lr=self.lr)
         for epoch in range(EPOCHS):
             print(f'Epoch {epoch}/{EPOCHS}')
