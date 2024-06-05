@@ -11,7 +11,7 @@ from python_code.detectors.deepsic_trainer import DeepSICTrainer
 from python_code.detectors.hypernetwork_deepsic.hyper_deepsic import HyperDeepSICDetector
 from python_code.detectors.hypernetwork_deepsic.hypernetwork import Hypernetwork
 from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType, HIDDEN_SIZES_DICT, MAX_USERS, \
-    TRAINING_SYMBOLS, EPOCHS, USER_EMB_SIZE
+    EPOCHS, USER_EMB_SIZE
 from python_code.utils.metrics import count_parameters
 
 
@@ -19,11 +19,11 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
 
     def __init__(self):
         super().__init__()
-        self.lr = 1e-3
+        self.lr = 5e-4
         self.train_context_embedding = []
         self.test_context_embedding = []
         if TRAINING_TYPES_DICT[conf.training_type] == TrainingType.Online:
-            raise ValueError("Online training is not implemented for this _detector!!!")
+            raise ValueError("Online training is not implemented for this detector!!!")
 
     def __str__(self):
         return TRAINING_TYPES_DICT[conf.training_type].name + ' Hypernetwork-based DeepSIC'
@@ -49,14 +49,13 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         deepsic_output = self.hyper_deepsic(hyper_input, self.inference_weights[user])
         return self.softmax(deepsic_output)
 
-    def _get_context_embedding(self, H: torch.Tensor, user: int) -> torch.Tensor:
-        user_embeddings = H
+    def _get_context_embedding(self, h: torch.Tensor, user: int) -> torch.Tensor:
         ind = torch.LongTensor([0]).to(DEVICE)
         context_embedding = []
         for j in range(MAX_USERS):
-            if j in range(H.shape[0]):
+            if j in range(h.shape[0]):
                 if j != user:
-                    context_embedding.append(user_embeddings[j].reshape(1, -1))
+                    context_embedding.append(h[j].reshape(1, -1))
                 else:
                     context_embedding.append(self.this_user_vec(ind))
             else:
@@ -72,7 +71,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         self.optimizer = torch.optim.Adam(total_parameters, lr=self.lr)
         for epoch in range(EPOCHS):
             print(f'Epoch {epoch}/{EPOCHS}')
-            curr_batch = np.random.choice(len(hs), TRAINING_SYMBOLS)
+            curr_batch = np.random.choice(len(hs), 20)
             for i in curr_batch:
                 n_users = hs[i].shape[0]
                 for user in range(n_users):

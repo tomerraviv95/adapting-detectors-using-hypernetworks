@@ -1,5 +1,7 @@
 from enum import Enum
 
+from python_code import conf
+
 
 class DetectorType(Enum):
     seq_deepsic = 'seq_deepsic'
@@ -19,9 +21,9 @@ class TrainingType(Enum):
 
 
 TRAINING_TYPES_DICT = {'Joint': TrainingType.Joint, 'Online': TrainingType.Online}
-HIDDEN_SIZES_DICT = {TrainingType.Joint: 64, TrainingType.Online: 16}
+HIDDEN_SIZES_DICT = {TrainingType.Joint: 16, TrainingType.Online: 16}
 EPOCHS = 50
 
-MAX_USERS = 8
-TRAINING_SYMBOLS = 10
-USER_EMB_SIZE = 12
+MAX_USERS = conf.n_ant
+TRAINING_BLOCKS_PER_CONFIG = 100
+USER_EMB_SIZE = conf.n_ant

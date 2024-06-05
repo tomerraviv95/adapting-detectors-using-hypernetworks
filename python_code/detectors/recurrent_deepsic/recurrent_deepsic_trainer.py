@@ -1,4 +1,3 @@
-from collections import defaultdict
 from typing import List
 
 import torch
@@ -51,15 +50,14 @@ class RecDeepSICTrainer(DeepSICTrainer):
         Main training function for DeepSIC evaluater. Initializes the probabilities, then propagates them through
         the network, training sequentially each network and not by end-to-end manner (each one individually).
         """
-        # Obtaining the data for each number of users
-        mx_all_by_user, rx_all_by_user = defaultdict(list), defaultdict(list)
-        for mx, rx in zip(mxs, rxs):
-            n_user = mx.shape[1]
-            probs_vec = torch.rand(mx.shape).to(DEVICE)
-            mx_cur, rx_cur = self._prepare_data_for_training(mx, rx, probs_vec)
-            mx_all_by_user[n_user].append(mx_cur)
-            rx_all_by_user[n_user].append(rx_cur)
-
-        for n_user in mx_all_by_user.keys():
-            # Training the DeepSIC networks for the iteration>1
-            self.train_models(self.detector[n_user], mx_all_by_user[n_user], rx_all_by_user[n_user], n_user)
+        # training the per-user DeepSIC modules for each configuration of users
+        users_indices = [(mx.shape[1], i) for i, mx in enumerate(mxs)]
+        for n_user in range(MAX_USERS, 1, -1):
+            print(f"Training modules for {n_user} users")
+            relevant_ind_pairs = list(filter(lambda x: x[0] == n_user, users_indices))
+            tuples = [(mxs[ind[1]], rxs[ind[1]], torch.rand(mxs[ind[1]].shape).to(DEVICE)) for ind in
+                      relevant_ind_pairs]
+            l = [self._prepare_data_for_training(*cur_tuple) for cur_tuple in tuples]
+            mx_per_user, rx_per_user = list(zip(*l))
+            # Training the DeepSIC networks
+            self.train_models(self.detector[n_user], mx_per_user, rx_per_user, n_user)

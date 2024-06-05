@@ -8,7 +8,7 @@ from python_code import conf
 from python_code.datasets.channel_dataset import ChannelModelDataset
 from python_code.detectors import DETECTORS_TYPE_DICT
 from python_code.utils.channel_estimate import ls_channel_estimation
-from python_code.utils.constants import Phase, TrainingType, DetectorType, MAX_USERS, TRAINING_SYMBOLS
+from python_code.utils.constants import Phase, TrainingType, DetectorType, MAX_USERS, TRAINING_BLOCKS_PER_CONFIG
 from python_code.utils.metrics import calculate_error_rate
 
 random.seed(conf.seed)
@@ -30,7 +30,7 @@ class Evaluator(object):
     def __init__(self):
         self.detector = DETECTORS_TYPE_DICT[conf.detector_type]()
         self.train_channel_dataset = ChannelModelDataset(block_length=conf.train_block_length,
-                                                         blocks_num=TRAINING_SYMBOLS * (MAX_USERS - 1),
+                                                         blocks_num=TRAINING_BLOCKS_PER_CONFIG * (MAX_USERS - 1),
                                                          pilots_length=1, phase=Phase.TRAIN)
         self.test_channel_dataset = ChannelModelDataset(block_length=conf.test_block_length,
                                                         blocks_num=conf.test_blocks_num,
