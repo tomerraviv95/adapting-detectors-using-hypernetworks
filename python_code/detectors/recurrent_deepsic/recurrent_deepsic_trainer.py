@@ -53,8 +53,10 @@ class RecDeepSICTrainer(DeepSICTrainer):
         # training the per-user DeepSIC modules for each configuration of users
         users_indices = [(mx.shape[1], i) for i, mx in enumerate(mxs)]
         for n_user in range(MAX_USERS, 1, -1):
-            print(f"Training modules for {n_user} users")
             relevant_ind_pairs = list(filter(lambda x: x[0] == n_user, users_indices))
+            if len(relevant_ind_pairs) == 0:
+                continue
+            print(f"Training modules for {n_user} users")
             tuples = [(mxs[ind[1]], rxs[ind[1]], torch.rand(mxs[ind[1]].shape).to(DEVICE)) for ind in
                       relevant_ind_pairs]
             l = [self._prepare_data_for_training(*cur_tuple) for cur_tuple in tuples]
