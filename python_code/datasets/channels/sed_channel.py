@@ -22,18 +22,6 @@ SNR_PER_USER_DICT = {Phase.TRAIN: TRAIN_SNR_PER_USER, Phase.TEST: TEST_SNR_PER_U
 
 class SEDChannel:
     @staticmethod
-    def get_channel_matrix(n_ant: int, n_user: int) -> np.ndarray:
-        # H is the users X antennas channel matrix
-        # H_row has another index of the antenna per location, for each different user
-        H_row = np.array([i for i in range(n_ant)])
-        H_row = np.tile(H_row, [n_user, 1])
-        # H_column has another index of the user per location, for each different antenna
-        H_column = np.array([i for i in range(n_user)])
-        H_column = np.tile(H_column, [n_ant, 1]).T
-        H = np.exp(-np.abs(H_row - H_column))
-        return H
-
-    @staticmethod
     def get_snrs(n_user: int, index: int, phase: Phase) -> np.ndarray:
         snrs = []
         for i in range(n_user):
@@ -47,6 +35,18 @@ class SEDChannel:
             cur_snr = first_term + second_term
             snrs.append(cur_snr)
         return np.array(snrs)
+
+    @staticmethod
+    def get_channel_matrix(n_ant: int, n_user: int, index: int) -> np.ndarray:
+        # H is the users X antennas channel matrix
+        # H_row has another index of the antenna per location, for each different user
+        H_row = np.array([i for i in range(n_ant)])
+        H_row = np.tile(H_row, [n_user, 1])
+        # H_column has another index of the user per location, for each different antenna
+        H_column = np.array([i for i in range(n_user)])
+        H_column = np.tile(H_column, [n_ant, 1]).T
+        H = np.exp(-np.abs(H_row - H_column))
+        return H
 
     @staticmethod
     def transmit(s: np.ndarray, h: np.ndarray, snrs: np.ndarray) -> np.ndarray:

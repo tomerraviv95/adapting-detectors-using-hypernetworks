@@ -19,6 +19,10 @@ class TrainingType(Enum):
     Joint = 'Joint'
     Online = 'Online'
 
+class ChannelType(Enum):
+    SED = 'SED'
+    COST = 'COST'
+
 
 TRAINING_TYPES_DICT = {'Joint': TrainingType.Joint, 'Online': TrainingType.Online}
 HIDDEN_SIZES_DICT = {TrainingType.Joint: 16, TrainingType.Online: 16}
