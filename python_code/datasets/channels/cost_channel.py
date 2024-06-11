@@ -12,7 +12,7 @@ conf = Config()
 SCALING_COEF = 0.25
 MAX_FRAMES = 25
 
-SNR = 12
+SNR = 10
 MIN_POWER, MAX_POWER = -60, -20
 
 
