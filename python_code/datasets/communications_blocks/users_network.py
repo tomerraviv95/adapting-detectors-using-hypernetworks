@@ -6,7 +6,7 @@ NUMBER_OF_USERS_DICT = {
                       list(range(TRAINING_BLOCKS_PER_CONFIG, TRAINING_BLOCKS_PER_CONFIG * (MAX_USERS + 1),
                                  TRAINING_BLOCKS_PER_CONFIG)),
                       range(2, MAX_USERS + 1))},
-    Phase.TEST: {(0, 20): 4, (20, 40): 5, (40, 60): 6, (60, 80): 7, (80, 100): 8}}
+    Phase.TEST: {(0, 20): 14, (20, 40): 14, (40, 60): 14, (60, 80): 14, (80, 100): 14}}
 
 
 class UsersNetwork:

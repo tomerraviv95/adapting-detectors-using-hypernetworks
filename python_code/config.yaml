@@ -1,8 +1,8 @@
 # general settings
-seed: 2 # run seed
+seed: 3 # run seed
 n_ant: 20 # number of received signals
 channel_type: 'COST' # ['SED','COST']
-detector_type: 'hyper_deepsic' # ['rec_deepsic','hyper_deepsic']
+detector_type: 'rec_deepsic' # ['rec_deepsic','hyper_deepsic']
 training_type: 'Joint' # ['Joint','Online']
 
 # train settings

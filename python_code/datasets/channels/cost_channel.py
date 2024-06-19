@@ -9,7 +9,7 @@ from python_code.utils.constants import Phase, TRAINING_BLOCKS_PER_CONFIG
 
 conf = Config()
 
-SCALING_COEF = 0.25
+SCALING_COEF = 0.4
 MAX_FRAMES = 25
 
 SNR = 10

@@ -22,19 +22,19 @@ mpl.rcParams['legend.fontsize'] = 20
 mpl.rcParams['mathtext.fontset'] = 'stix'
 mpl.rcParams['font.family'] = 'STIXGeneral'
 
-COLORS_DICT = {'Joint Hypernetwork-based DeepSIC': 'red',
+COLORS_DICT = {'Hypernetwork-based DeepSIC': 'red',
                'Joint Recurrent DeepSIC': 'orange',
                'Online Recurrent DeepSIC': 'blue',
                'Online Sequential DeepSIC': 'green',
                'Joint RNN Hypernetwork-based DeepSIC': 'black'}
 
-MARKERS_DICT = {'Joint Hypernetwork-based DeepSIC': 'd',
+MARKERS_DICT = {'Hypernetwork-based DeepSIC': 'd',
                 'Joint Recurrent DeepSIC': 'd',
                 'Online Recurrent DeepSIC': 'x',
                 'Online Sequential DeepSIC': 'x',
                 'Joint RNN Hypernetwork-based DeepSIC': 'o'}
 
-LINESTYLES_DICT = {'Joint Hypernetwork-based DeepSIC': 'solid',
+LINESTYLES_DICT = {'Hypernetwork-based DeepSIC': 'solid',
                    'Joint Recurrent DeepSIC': 'dotted',
                    'Online Recurrent DeepSIC': 'solid',
                    'Online Sequential DeepSIC': 'dotted',
@@ -76,8 +76,7 @@ if __name__ == "__main__":
     plt.grid(which='both', ls='--')
     leg = plt.legend(loc='upper left', prop={'size': 20}, handlelength=4)
     plt.yscale('log')
-    # plt.ylim(bottom=5 * 10 ** -4, top=3 * 10 ** -2)
-    plt.ylim(bottom=5 * 10 ** -5, top=5 * 10 ** -3)
+    plt.ylim(bottom=5 * 10 ** -4, top=3 * 10 ** -2)
     plt.savefig(os.path.join(FIGURES_DIR, folder_name, f'ser_{conf.n_ant}.png'),
                 bbox_inches='tight')
     plt.show()

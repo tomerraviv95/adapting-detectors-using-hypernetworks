@@ -26,7 +26,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
             raise ValueError("Online training is not implemented for this detector!!!")
 
     def __str__(self):
-        return TRAINING_TYPES_DICT[conf.training_type].name + ' Hypernetwork-based DeepSIC'
+        return 'Hypernetwork-based DeepSIC'
 
     def _initialize_detector(self):
         self.hidden_size = HIDDEN_SIZES_DICT[TrainingType.Online]
