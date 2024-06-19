@@ -37,7 +37,7 @@ class SEDChannel:
         return np.array(snrs)
 
     @staticmethod
-    def get_channel_matrix(n_ant: int, n_user: int, index: int) -> np.ndarray:
+    def get_channel_matrix(n_ant: int, n_user: int, index: int, phase: Phase = None) -> np.ndarray:
         # H is the users X antennas channel matrix
         # H_row has another index of the antenna per location, for each different user
         H_row = np.array([i for i in range(n_ant)])

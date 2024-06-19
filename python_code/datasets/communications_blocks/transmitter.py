@@ -5,8 +5,8 @@ from python_code.datasets.channels.cost_channel import COSTChannel
 from python_code.datasets.channels.sed_channel import SEDChannel
 from python_code.utils.constants import Phase, ChannelType
 
-TEST_CHANNELS_DICT = {ChannelType.SED.name: SEDChannel,
-                      ChannelType.COST.name: COSTChannel}
+CHANNELS_DICT = {ChannelType.SED.name: SEDChannel,
+                 ChannelType.COST.name: COSTChannel}
 
 
 class Transmitter:
@@ -14,12 +14,9 @@ class Transmitter:
         self.phase = phase
 
     def transmit(self, s: np.ndarray, index: int, users: int) -> np.ndarray:
-        if self.phase == Phase.TEST:
-            cur_channel = TEST_CHANNELS_DICT[conf.channel_type]
-        else:
-            cur_channel = SEDChannel
+        cur_channel = CHANNELS_DICT[conf.channel_type]
         snrs = cur_channel.get_snrs(users, index, self.phase)
-        H = cur_channel.get_channel_matrix(conf.n_ant, users, index)
+        H = cur_channel.get_channel_matrix(conf.n_ant, users, index, self.phase)
         # pass through datasets
         rx = cur_channel.transmit(s=s, h=H, snrs=snrs)
         return rx

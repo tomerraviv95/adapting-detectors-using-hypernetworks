@@ -9,6 +9,6 @@ training_type: 'Joint' # ['Joint','Online']
 train_block_length: 1000 # coherence block time, total size of pilot + data. values: int.
 
 # test settings
-test_block_length: 20200 # coherence block time, total size of pilot + data. values: int.
-test_pilots_length: 200 # pilot bits
+test_block_length: 20500 # coherence block time, total size of pilot + data. values: int.
+test_pilots_length: 500 # pilot bits
 test_blocks_num: 100 # number of validation frames. values: int.

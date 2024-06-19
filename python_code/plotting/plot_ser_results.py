@@ -76,7 +76,8 @@ if __name__ == "__main__":
     plt.grid(which='both', ls='--')
     leg = plt.legend(loc='upper left', prop={'size': 20}, handlelength=4)
     plt.yscale('log')
-    plt.ylim(bottom=5 * 10 ** -4, top=3 * 10 ** -2)
+    # plt.ylim(bottom=5 * 10 ** -4, top=3 * 10 ** -2)
+    plt.ylim(bottom=5 * 10 ** -5, top=5 * 10 ** -3)
     plt.savefig(os.path.join(FIGURES_DIR, folder_name, f'ser_{conf.n_ant}.png'),
                 bbox_inches='tight')
     plt.show()
