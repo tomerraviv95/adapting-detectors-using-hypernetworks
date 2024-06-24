@@ -11,7 +11,7 @@ from python_code.utils.constants import Phase
 
 mpl.rcParams['xtick.labelsize'] = 24
 mpl.rcParams['ytick.labelsize'] = 24
-mpl.rcParams['font.size'] = 16
+mpl.rcParams['font.size'] = 15
 mpl.rcParams['figure.autolayout'] = True
 mpl.rcParams['figure.figsize'] = [9.5, 6.45]
 mpl.rcParams['axes.titlesize'] = 28
@@ -39,8 +39,8 @@ if __name__ == "__main__":
     for user in snrs.keys():
         cur_samples = np.array(snrs[user])
         plt.plot(cur_samples[:, 0], cur_samples[:, 1], label=f'User {user + 1}')
-        plt.ylabel(r'SNR [dB]', fontsize=20)
-        plt.xlabel(r'Block Index', fontsize=20)
+        plt.ylabel(r'SNR [dB]')
+        plt.xlabel(r'Block Index')
         plt.grid(True, which='both')
     plt.legend(loc='upper left')
     plt.show()

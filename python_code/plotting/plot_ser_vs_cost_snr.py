@@ -15,7 +15,8 @@ if __name__ == "__main__":
         {'detector_type': 'rec_deepsic', 'training_type': 'Online'},
         {'detector_type': 'hyper_deepsic', 'training_type': 'Joint', 'train_block_length': 5000},
     ]
-    seeds = [1, 2, 3]
+    COST_snrs = [8, 10, 12, 14]
+    seeds = [1, 2, 3, 4, 5]
 
     # path for the saved figure
     current_day_time = datetime.now()
@@ -28,24 +29,28 @@ if __name__ == "__main__":
     for params in params_list:
         for key, value in params.items():
             conf.set_value(key, value)
-        values = 0
-        for seed in seeds:
-            conf.set_value('seed', seed)
-            evaluator = Evaluator()
-            metrics_output: MetricOutput = evaluator.evaluate()
-            method_name = evaluator.detector.__str__()
-            values += np.cumsum(np.array(metrics_output.ser_list)) / len(metrics_output.ser_list)
-        values /= len(seeds)
-        plt.plot(range(len(metrics_output.ser_list)), values, label=method_name, color=COLORS_DICT[method_name],
+
+        ser_values = []
+        for snr in COST_snrs:
+            conf.set_value('COST_SNR', snr)
+            cur_ser = 0
+            for seed in seeds:
+                conf.set_value('seed', seed)
+                evaluator = Evaluator()
+                metrics_output: MetricOutput = evaluator.evaluate()
+                method_name = evaluator.detector.__str__()
+                cur_ser += np.mean(np.array(metrics_output.ser_list))
+            ser_values.append(cur_ser / len(seeds))
+        plt.plot(COST_snrs, ser_values, label=method_name, color=COLORS_DICT[method_name],
                  markevery=20, marker=MARKERS_DICT[method_name], markersize=11,
                  linestyle=LINESTYLES_DICT[method_name], linewidth=2.2)
 
-    plt.xlabel('Block Index')
+    plt.xlabel('SNR [dB]')
     plt.ylabel('SER')
     plt.grid(which='both', ls='--')
     leg = plt.legend(loc='upper left', prop={'size': 20}, handlelength=4)
     plt.yscale('log')
-    plt.ylim(bottom=5 * 10 ** -4, top=3 * 10 ** -2)
-    plt.savefig(os.path.join(FIGURES_DIR, folder_name, f'ser_{conf.n_ant}.png'),
+    plt.ylim(bottom=5 * 10 ** -4, top=5 * 10 ** -2)
+    plt.savefig(os.path.join(FIGURES_DIR, folder_name, f'ser_vs_cost_snr_{conf.n_ant}.png'),
                 bbox_inches='tight')
     plt.show()

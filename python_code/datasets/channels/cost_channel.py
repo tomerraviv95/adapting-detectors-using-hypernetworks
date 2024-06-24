@@ -12,7 +12,6 @@ conf = Config()
 SCALING_COEF = 0.4
 MAX_FRAMES = 25
 
-SNR = 10
 MIN_POWER, MAX_POWER = -70, -20
 
 
@@ -20,7 +19,7 @@ class COSTChannel:
 
     @staticmethod
     def get_snrs(n_user: int, index: int, phase: Phase) -> np.ndarray:
-        snrs = [SNR for _ in range(n_user)]
+        snrs = [conf.COST_SNR for _ in range(n_user)]
         return np.array(snrs)
 
     @staticmethod
