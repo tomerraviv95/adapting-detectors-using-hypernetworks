@@ -36,6 +36,13 @@ class Evaluator(object):
                                                         blocks_num=conf.test_blocks_num,
                                                         pilots_length=conf.test_pilots_length,
                                                         phase=Phase.TEST)
+        self.joint_training()
+
+    def joint_training(self):
+        message_words, received_words = self.train_channel_dataset.__getitem__()
+        H_hats = [ls_channel_estimation(mx_pilots, rx_pilots) for mx_pilots, rx_pilots in
+                  zip(message_words, received_words)]
+        self.detector.train(message_words, received_words, H_hats)
 
     def evaluate(self) -> MetricOutput:
         """
@@ -48,13 +55,6 @@ class Evaluator(object):
         print(self.detector.count_parameters())
         torch.cuda.empty_cache()
         ser_list, ber_list, ece_list = [], [], []
-        # ---------------------------------------------------------
-        # Joint training - as in the config "training_type" option
-        message_words, received_words = self.train_channel_dataset.__getitem__()
-        H_hats = [ls_channel_estimation(mx_pilots, rx_pilots) for mx_pilots, rx_pilots in
-                  zip(message_words, received_words)]
-        self.detector.train(message_words, received_words, H_hats)
-        # ---------------------------------------------------------
         message_words, received_words = self.test_channel_dataset.__getitem__()
         # detect sequentially
         for block_ind in range(conf.test_blocks_num):

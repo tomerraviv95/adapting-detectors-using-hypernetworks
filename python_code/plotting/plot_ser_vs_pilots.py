@@ -15,8 +15,8 @@ if __name__ == "__main__":
         {'detector_type': 'rec_deepsic', 'training_type': 'Online'},
         {'detector_type': 'hyper_deepsic', 'training_type': 'Joint', 'train_block_length': 5000},
     ]
-    COST_snrs = [8, 10, 12, 14]
-    seeds = [1, 2, 3, 4, 5]
+    pilot_sizes = [200, 400, 600, 800]
+    seeds = [1, 2, 3]
 
     # path for the saved figure
     current_day_time = datetime.now()
@@ -30,8 +30,8 @@ if __name__ == "__main__":
         for key, value in params.items():
             conf.set_value(key, value)
         ser_values = []
-        for snr in COST_snrs:
-            conf.set_value('COST_SNR', snr)
+        for pilot_size in pilot_sizes:
+            conf.set_value('test_pilots_length', pilot_size)
             cur_ser = 0
             evaluator = Evaluator()
             method_name = evaluator.detector.__str__()
@@ -40,15 +40,15 @@ if __name__ == "__main__":
                 metrics_output: MetricOutput = evaluator.evaluate()
                 cur_ser += np.mean(np.array(metrics_output.ser_list))
             ser_values.append(cur_ser / len(seeds))
-        plt.plot(COST_snrs, ser_values, label=method_name, color=COLORS_DICT[method_name],
+        plt.plot(pilot_sizes, ser_values, label=method_name, color=COLORS_DICT[method_name],
                  marker=MARKERS_DICT[method_name], markersize=11,
                  linestyle=LINESTYLES_DICT[method_name], linewidth=2.2)
 
-    plt.xlabel('SNR [dB]')
+    plt.xlabel('Pilots Number')
     plt.ylabel('SER')
     plt.grid(which='both', ls='--')
     leg = plt.legend(loc='lower left', prop={'size': 20}, handlelength=4)
     plt.yscale('log')
-    plt.savefig(os.path.join(FIGURES_DIR, folder_name, f'ser_vs_cost_snr_{conf.n_ant}.png'),
+    plt.savefig(os.path.join(FIGURES_DIR, folder_name, f'ser_vs_pilots_number_{conf.n_ant}.png'),
                 bbox_inches='tight')
     plt.show()
