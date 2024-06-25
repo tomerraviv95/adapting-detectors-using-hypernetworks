@@ -29,26 +29,25 @@ if __name__ == "__main__":
     for params in params_list:
         for key, value in params.items():
             conf.set_value(key, value)
-
         ser_values = []
         for snr in COST_snrs:
             conf.set_value('COST_SNR', snr)
             cur_ser = 0
+            evaluator = Evaluator()
+            method_name = evaluator.detector.__str__()
             for seed in seeds:
                 conf.set_value('seed', seed)
-                evaluator = Evaluator()
                 metrics_output: MetricOutput = evaluator.evaluate()
-                method_name = evaluator.detector.__str__()
                 cur_ser += np.mean(np.array(metrics_output.ser_list))
             ser_values.append(cur_ser / len(seeds))
         plt.plot(COST_snrs, ser_values, label=method_name, color=COLORS_DICT[method_name],
-                 markevery=20, marker=MARKERS_DICT[method_name], markersize=11,
+                 marker=MARKERS_DICT[method_name], markersize=11,
                  linestyle=LINESTYLES_DICT[method_name], linewidth=2.2)
 
     plt.xlabel('SNR [dB]')
     plt.ylabel('SER')
     plt.grid(which='both', ls='--')
-    leg = plt.legend(loc='upper left', prop={'size': 20}, handlelength=4)
+    leg = plt.legend(loc='lower left', prop={'size': 20}, handlelength=4)
     plt.yscale('log')
     plt.ylim(bottom=5 * 10 ** -4, top=5 * 10 ** -2)
     plt.savefig(os.path.join(FIGURES_DIR, folder_name, f'ser_vs_cost_snr_{conf.n_ant}.png'),

@@ -12,8 +12,8 @@ from python_code.plotting import *
 if __name__ == "__main__":
     params_list = [
         {'detector_type': 'rec_deepsic', 'training_type': 'Joint', 'train_block_length': 1000},
-        {'detector_type': 'rec_deepsic', 'training_type': 'Online'},
-        {'detector_type': 'hyper_deepsic', 'training_type': 'Joint', 'train_block_length': 5000},
+        # {'detector_type': 'rec_deepsic', 'training_type': 'Online'},
+        # {'detector_type': 'hyper_deepsic', 'training_type': 'Joint', 'train_block_length': 5000},
     ]
     seeds = [1, 2, 3]
 
@@ -29,11 +29,11 @@ if __name__ == "__main__":
         for key, value in params.items():
             conf.set_value(key, value)
         values = 0
+        evaluator = Evaluator()
+        method_name = evaluator.detector.__str__()
         for seed in seeds:
             conf.set_value('seed', seed)
-            evaluator = Evaluator()
             metrics_output: MetricOutput = evaluator.evaluate()
-            method_name = evaluator.detector.__str__()
             values += np.cumsum(np.array(metrics_output.ser_list)) / len(metrics_output.ser_list)
         values /= len(seeds)
         plt.plot(range(len(metrics_output.ser_list)), values, label=method_name, color=COLORS_DICT[method_name],
