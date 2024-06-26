@@ -32,10 +32,6 @@ class Evaluator(object):
         self.train_channel_dataset = ChannelModelDataset(block_length=conf.train_block_length,
                                                          blocks_num=TRAINING_BLOCKS_PER_CONFIG * (MAX_USERS - 1),
                                                          pilots_length=1, phase=Phase.TRAIN)
-        self.test_channel_dataset = ChannelModelDataset(block_length=conf.test_block_length,
-                                                        blocks_num=conf.test_blocks_num,
-                                                        pilots_length=conf.test_pilots_length,
-                                                        phase=Phase.TEST)
         self.joint_training()
 
     def joint_training(self):
@@ -53,6 +49,10 @@ class Evaluator(object):
         """
         print(f"Detecting using {str(self.detector)}")
         print(self.detector.count_parameters())
+        self.test_channel_dataset = ChannelModelDataset(block_length=conf.test_block_length,
+                                                        blocks_num=conf.test_blocks_num,
+                                                        pilots_length=conf.test_pilots_length,
+                                                        phase=Phase.TEST)
         torch.cuda.empty_cache()
         ser_list, ber_list, ece_list = [], [], []
         message_words, received_words = self.test_channel_dataset.__getitem__()

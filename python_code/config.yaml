@@ -3,8 +3,9 @@ seed: 3 # run seed
 n_ant: 20 # number of received signals
 channel_type: 'COST' # ['SED','COST']
 COST_SNR: 10 # the SNR for the cost scenario. Does not affect the SED channel.
-detector_type: 'rec_deepsic' # ['rec_deepsic','hyper_deepsic']
+detector_type: 'hyper_deepsic' # ['rec_deepsic','hyper_deepsic']
 training_type: 'Joint' # ['Joint','Online']
+train_test_match: False
 
 # train settings
 train_block_length: 1000 # coherence block time, total size of pilot + data. values: int.
