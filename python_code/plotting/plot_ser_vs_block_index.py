@@ -13,7 +13,7 @@ if __name__ == "__main__":
     params_list = [
         {'detector_type': 'rec_deepsic', 'training_type': 'Joint', 'train_block_length': 1000},
         {'detector_type': 'rec_deepsic', 'training_type': 'Online', 'train_block_length': 1000},
-        {'detector_type': 'hyper_deepsic', 'training_type': 'Joint', 'train_block_length': 1000},
+        {'detector_type': 'hyper_deepsic', 'training_type': 'Joint', 'train_block_length': 5000},
     ]
     seeds = [1, 2, 3]
 
@@ -45,7 +45,6 @@ if __name__ == "__main__":
     plt.grid(which='both', ls='--')
     leg = plt.legend(loc='upper left', prop={'size': 20}, handlelength=4)
     plt.yscale('log')
-    # plt.ylim(bottom=5 * 10 ** -4, top=3 * 10 ** -2)
     plt.savefig(os.path.join(FIGURES_DIR, folder_name, f'ser_{conf.n_ant}.png'),
                 bbox_inches='tight')
     plt.show()

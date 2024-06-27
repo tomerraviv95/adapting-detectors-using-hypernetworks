@@ -16,7 +16,7 @@ if __name__ == "__main__":
         {'detector_type': 'hyper_deepsic', 'training_type': 'Joint', 'train_block_length': 1000},
     ]
     pilot_sizes = [200, 400, 600, 800, 1000]
-    seeds = [1]
+    seeds = [1, 2, 3]
 
     # path for the saved figure
     current_day_time = datetime.now()
