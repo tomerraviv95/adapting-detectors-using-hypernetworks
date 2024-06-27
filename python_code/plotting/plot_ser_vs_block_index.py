@@ -12,8 +12,8 @@ from python_code.plotting import *
 if __name__ == "__main__":
     params_list = [
         {'detector_type': 'rec_deepsic', 'training_type': 'Joint', 'train_block_length': 1000},
-        # {'detector_type': 'rec_deepsic', 'training_type': 'Online'},
-        # {'detector_type': 'hyper_deepsic', 'training_type': 'Joint', 'train_block_length': 5000},
+        {'detector_type': 'rec_deepsic', 'training_type': 'Online', 'train_block_length': 1000},
+        {'detector_type': 'hyper_deepsic', 'training_type': 'Joint', 'train_block_length': 1000},
     ]
     seeds = [1, 2, 3]
 
@@ -29,10 +29,10 @@ if __name__ == "__main__":
         for key, value in params.items():
             conf.set_value(key, value)
         values = 0
-        evaluator = Evaluator()
-        method_name = evaluator.detector.__str__()
         for seed in seeds:
             conf.set_value('seed', seed)
+            evaluator = Evaluator()
+            method_name = evaluator.detector.__str__()
             metrics_output: MetricOutput = evaluator.evaluate()
             values += np.cumsum(np.array(metrics_output.ser_list)) / len(metrics_output.ser_list)
         values /= len(seeds)
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     plt.grid(which='both', ls='--')
     leg = plt.legend(loc='upper left', prop={'size': 20}, handlelength=4)
     plt.yscale('log')
-    plt.ylim(bottom=5 * 10 ** -4, top=3 * 10 ** -2)
+    # plt.ylim(bottom=5 * 10 ** -4, top=3 * 10 ** -2)
     plt.savefig(os.path.join(FIGURES_DIR, folder_name, f'ser_{conf.n_ant}.png'),
                 bbox_inches='tight')
     plt.show()
