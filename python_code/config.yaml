@@ -1,16 +1,17 @@
 # general settings
-seed: 1 # run seed
+seed: 2 # run seed
 n_ant: 20 # number of received signals
 channel_type: 'COST' # ['SED','COST']
-COST_SNR: 10 # the SNR for the cost scenario. Does not affect the SED channel.
+COST_SNR: 14 # the SNR for the cost scenario. Does not affect the SED channel.
 detector_type: 'hyper_deepsic' # ['rec_deepsic','hyper_deepsic']
 training_type: 'Joint' # ['Joint','Online']
-train_test_match: False # [True,False]
+# [True,False] If False then for COST/SED at test, train on COST/SED respectively. If True - mismatched train and test.
+train_test_mismatch: False
 
 # train settings
 train_block_length: 1000 # coherence block time, total size of pilot + data. values: int.
 
 # test settings
-test_block_length: 20500 # coherence block time, total size of pilot + data. values: int.
-test_pilots_length: 500 # pilot bits
+test_block_length: 21000 # coherence block time, total size of pilot + data. values: int.
+test_pilots_length: 1000 # pilot bits
 test_blocks_num: 100 # number of validation frames. values: int.

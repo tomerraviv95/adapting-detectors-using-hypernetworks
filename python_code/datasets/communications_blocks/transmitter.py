@@ -12,7 +12,7 @@ CHANNELS_DICT = {ChannelType.SED.name: SEDChannel,
 class Transmitter:
     def __init__(self, phase: Phase):
         self.phase = phase
-        self.train_test_mismatch = (self.phase == Phase.TRAIN) and (conf.train_test_match)
+        self.train_test_mismatch = (self.phase == Phase.TRAIN) and (conf.train_test_mismatch)
 
     def transmit(self, s: np.ndarray, index: int, users: int) -> np.ndarray:
         if self.train_test_mismatch:

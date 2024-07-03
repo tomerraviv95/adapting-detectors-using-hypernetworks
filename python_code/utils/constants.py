@@ -19,6 +19,7 @@ class TrainingType(Enum):
     Joint = 'Joint'
     Online = 'Online'
 
+
 class ChannelType(Enum):
     SED = 'SED'
     COST = 'COST'
@@ -26,8 +27,6 @@ class ChannelType(Enum):
 
 TRAINING_TYPES_DICT = {'Joint': TrainingType.Joint, 'Online': TrainingType.Online}
 HIDDEN_SIZES_DICT = {TrainingType.Joint: 16, TrainingType.Online: 16}
-EPOCHS = 50
-
 MAX_USERS = conf.n_ant
 TRAINING_BLOCKS_PER_CONFIG = 100
 USER_EMB_SIZE = conf.n_ant

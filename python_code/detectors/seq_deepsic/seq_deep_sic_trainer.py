@@ -6,7 +6,9 @@ from torch import nn
 from python_code import DEVICE, conf
 from python_code.detectors.deepsic_detector import DeepSICDetector
 from python_code.detectors.deepsic_trainer import DeepSICTrainer
-from python_code.utils.constants import TRAINING_TYPES_DICT, MAX_USERS, EPOCHS
+from python_code.utils.constants import TRAINING_TYPES_DICT, MAX_USERS
+
+EPOCHS = 50
 
 
 class SeqDeepSICTrainer(DeepSICTrainer):

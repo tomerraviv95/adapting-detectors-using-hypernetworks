@@ -11,12 +11,13 @@ from python_code.plotting import *
 
 if __name__ == "__main__":
     params_list = [
-        {'detector_type': 'rec_deepsic', 'training_type': 'Joint', 'train_block_length': 1000},
-        {'detector_type': 'rec_deepsic', 'training_type': 'Online', 'train_block_length': 1000},
+        # {'detector_type': 'rec_deepsic', 'training_type': 'Joint', 'train_block_length': 1000},
+        # {'detector_type': 'rec_deepsic', 'training_type': 'Online', 'train_block_length': 1000},
         {'detector_type': 'hyper_deepsic', 'training_type': 'Joint', 'train_block_length': 1000},
     ]
     COST_snrs = [8, 10, 12, 14]
-    seeds = [1]
+    COST_snrs = [12, 14]
+    seeds = [1, 2, 3]
 
     # path for the saved figure
     current_day_time = datetime.now()
@@ -33,10 +34,10 @@ if __name__ == "__main__":
         for seed in seeds:
             conf.set_value('seed', seed)
             cur_ser_values = []
-            evaluator = Evaluator()
-            method_name = evaluator.detector.__str__()
             for snr in COST_snrs:
                 conf.set_value('COST_SNR', snr)
+                evaluator = Evaluator()
+                method_name = evaluator.detector.__str__()
                 metrics_output: MetricOutput = evaluator.evaluate()
                 cur_ser = np.mean(np.array(metrics_output.ser_list))
                 cur_ser_values.append(cur_ser)

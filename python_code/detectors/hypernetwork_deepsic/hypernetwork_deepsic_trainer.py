@@ -10,9 +10,10 @@ from python_code.detectors.deepsic_detector import DeepSICDetector
 from python_code.detectors.deepsic_trainer import DeepSICTrainer
 from python_code.detectors.hypernetwork_deepsic.hyper_deepsic import HyperDeepSICDetector
 from python_code.detectors.hypernetwork_deepsic.hypernetwork import Hypernetwork
-from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType, HIDDEN_SIZES_DICT, MAX_USERS, \
-    EPOCHS, USER_EMB_SIZE
+from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType, HIDDEN_SIZES_DICT, MAX_USERS, USER_EMB_SIZE
 from python_code.utils.metrics import count_parameters
+
+EPOCHS = 75
 
 
 class HypernetworkDeepSICTrainer(DeepSICTrainer):
