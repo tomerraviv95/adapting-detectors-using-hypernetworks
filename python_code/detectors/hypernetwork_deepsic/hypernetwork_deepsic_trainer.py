@@ -13,14 +13,14 @@ from python_code.detectors.hypernetwork_deepsic.hypernetwork import Hypernetwork
 from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType, HIDDEN_SIZES_DICT, MAX_USERS, USER_EMB_SIZE
 from python_code.utils.metrics import count_parameters
 
-EPOCHS = 75
+EPOCHS = 20
 
 
 class HypernetworkDeepSICTrainer(DeepSICTrainer):
 
     def __init__(self):
         super().__init__()
-        self.lr = 5e-4
+        self.lr = 1e-4
         self.train_context_embedding = []
         self.test_context_embedding = []
         if TRAINING_TYPES_DICT[conf.training_type] == TrainingType.Online:
@@ -71,8 +71,9 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         total_parameters = chain(total_parameters, self.no_user_vec.parameters())
         self.optimizer = torch.optim.Adam(total_parameters, lr=self.lr)
         for epoch in range(EPOCHS):
-            print(f'Epoch {epoch}/{EPOCHS}')
-            curr_batch = np.random.choice(len(hs), 20)
+            print(f'Epoch {epoch + 1}/{EPOCHS}')
+            curr_batch = np.random.choice(len(hs), 100)
+            total_loss = 0
             for i in curr_batch:
                 n_users = hs[i].shape[0]
                 for user in range(n_users):
@@ -96,6 +97,9 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
                     self.optimizer.zero_grad()
                     loss.backward()
                     self.optimizer.step()
+                    total_loss += loss / n_users
+            avg_loss = (total_loss / len(curr_batch)).item()
+            print(f"Loss:{avg_loss}")
 
     def count_parameters(self):
         params_high = count_parameters(self.hypernetwork)

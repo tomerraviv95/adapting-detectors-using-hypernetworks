@@ -11,13 +11,12 @@ from python_code.plotting import *
 
 if __name__ == "__main__":
     params_list = [
-        # {'detector_type': 'rec_deepsic', 'training_type': 'Joint', 'train_block_length': 1000},
-        # {'detector_type': 'rec_deepsic', 'training_type': 'Online', 'train_block_length': 1000},
+        {'detector_type': 'rec_deepsic', 'training_type': 'Joint', 'train_block_length': 1000},
+        {'detector_type': 'rec_deepsic', 'training_type': 'Online', 'train_block_length': 1000},
         {'detector_type': 'hyper_deepsic', 'training_type': 'Joint', 'train_block_length': 1000},
     ]
-    COST_snrs = [8, 10, 12, 14]
-    COST_snrs = [12, 14]
-    seeds = [1, 2, 3]
+    cost_snrs = [8, 10, 12, 14]
+    seeds = range(1, 4)
 
     # path for the saved figure
     current_day_time = datetime.now()
@@ -31,19 +30,18 @@ if __name__ == "__main__":
         for key, value in params.items():
             conf.set_value(key, value)
         ser_values = []
-        for seed in seeds:
-            conf.set_value('seed', seed)
-            cur_ser_values = []
-            for snr in COST_snrs:
-                conf.set_value('COST_SNR', snr)
-                evaluator = Evaluator()
-                method_name = evaluator.detector.__str__()
+        for snr in cost_snrs:
+            conf.set_value('cost_snr', snr)
+            evaluator = Evaluator()
+            ser = 0
+            for seed in seeds:
+                conf.set_value('seed', seed)
+                print(f"Seed: {seed}, SNR: {snr}")
                 metrics_output: MetricOutput = evaluator.evaluate()
-                cur_ser = np.mean(np.array(metrics_output.ser_list))
-                cur_ser_values.append(cur_ser)
-            ser_values.append(cur_ser_values)
-        ser_values = np.sum(np.array(ser_values), axis=0) / len(seeds)
-        plt.plot(COST_snrs, ser_values, label=method_name, color=COLORS_DICT[method_name],
+                method_name = evaluator.detector.__str__()
+                ser += np.mean(np.array(metrics_output.ser_list))
+            ser_values.append(ser / len(seeds))
+        plt.plot(cost_snrs, ser_values, label=method_name, color=COLORS_DICT[method_name],
                  marker=MARKERS_DICT[method_name], markersize=11,
                  linestyle=LINESTYLES_DICT[method_name], linewidth=2.2)
 

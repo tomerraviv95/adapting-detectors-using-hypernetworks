@@ -9,9 +9,7 @@ from python_code.utils.constants import Phase, TRAINING_BLOCKS_PER_CONFIG
 
 conf = Config()
 
-SCALING_COEF = 0.4
-MAX_FRAMES = 25
-
+SCALING_COEF = 0.35
 MIN_POWER, MAX_POWER = -70, -20
 
 
@@ -19,7 +17,7 @@ class COSTChannel:
 
     @staticmethod
     def get_snrs(n_user: int, index: int, phase: Phase) -> np.ndarray:
-        snrs = [conf.COST_SNR for _ in range(n_user)]
+        snrs = [conf.cost_snr for _ in range(n_user)]
         return np.array(snrs)
 
     @staticmethod
@@ -34,8 +32,8 @@ class COSTChannel:
             total_h_user = scipy.io.loadmat(path_to_ant_mat)['h_omni_power']
             norm_h_user = (total_h_user - MIN_POWER) / (MAX_POWER - MIN_POWER)
             cur_h_user = norm_h_user[:n_user, index % TRAINING_BLOCKS_PER_CONFIG]
-            total_h[:, i - 1] = SCALING_COEF * cur_h_user  # beamforming to reduce sidelobes
-        # applying beamforming for each user
+            total_h[:, i - 1] = SCALING_COEF * cur_h_user  # reduce side-lobes via beamforming
+        # beamforming (beam focusing) for each user
         total_h[np.arange(n_user), np.arange(n_user)] = 1
         if np.any(total_h < 0) or np.any(total_h > 1):
             print('Error in the normalization of the channel! values either smaller than 0 or larger than 1')
