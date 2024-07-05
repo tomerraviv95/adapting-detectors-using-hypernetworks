@@ -1,5 +1,5 @@
 # general settings
-seed: 10 # run seed
+seed: 9 # run seed
 n_ant: 20 # number of received signals
 channel_type: 'COST' # ['SED','COST']
 cost_snr: 10 # the SNR for the cost scenario. Does not affect the SED channel.

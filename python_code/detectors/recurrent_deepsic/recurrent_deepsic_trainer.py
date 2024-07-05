@@ -21,11 +21,14 @@ class RecDeepSICTrainer(DeepSICTrainer):
 
     def _initialize_detector(self):
         # populate 1D list for Storing the DeepSIC Networks
-        self.detector = {user: [DeepSICDetector(user, self.hidden_size).to(DEVICE) for _ in range(user)] for user in
-                         range(2, MAX_USERS + 1)}
+        self.detector = torch.nn.ModuleDict()
+        for user in range(2, MAX_USERS + 1):
+            cur_module_list = torch.nn.ModuleList(
+                [DeepSICDetector(user, self.hidden_size).to(DEVICE) for _ in range(user)])
+            self.detector.update({str(user): cur_module_list})
 
     def _soft_symbols_from_probs(self, input: torch.Tensor, user: int, hs: int, i: int = None) -> torch.Tensor:
-        return self.softmax(self.detector[hs][user](input.float()))
+        return self.softmax(self.detector[str(hs)][user](input.float()))
 
     def train_model(self, single_model: nn.Module, mx: List[torch.Tensor], rx: List[torch.Tensor]):
         """
@@ -64,4 +67,4 @@ class RecDeepSICTrainer(DeepSICTrainer):
             l = [self._prepare_data_for_training(*cur_tuple) for cur_tuple in tuples]
             mx_per_user, rx_per_user = list(zip(*l))
             # Training the DeepSIC networks
-            self.train_models(self.detector[n_user], mx_per_user, rx_per_user, n_user)
+            self.train_models(self.detector[str(n_user)], mx_per_user, rx_per_user, n_user)

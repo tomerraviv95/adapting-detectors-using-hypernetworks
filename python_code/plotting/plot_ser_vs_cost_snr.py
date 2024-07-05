@@ -11,9 +11,9 @@ from python_code.plotting import *
 
 if __name__ == "__main__":
     params_list = [
-        {'detector_type': 'rec_deepsic', 'training_type': 'Joint', 'train_block_length': 1000},
-        {'detector_type': 'rec_deepsic', 'training_type': 'Online', 'train_block_length': 1000},
-        {'detector_type': 'hyper_deepsic', 'training_type': 'Joint', 'train_block_length': 1000},
+        {'detector_type': 'rec_deepsic', 'training_type': 'Joint'},
+        # {'detector_type': 'rec_deepsic', 'training_type': 'Online'},
+        {'detector_type': 'hyper_deepsic', 'training_type': 'Joint'},
     ]
     cost_snrs = [8, 10, 12, 14]
     seeds = range(1, 4)

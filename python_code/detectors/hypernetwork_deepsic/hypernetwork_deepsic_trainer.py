@@ -99,7 +99,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
                     self.optimizer.step()
                     total_loss += loss / n_users
             avg_loss = (total_loss / len(curr_batch)).item()
-            print(f"Loss:{avg_loss}")
+            print(f"Loss: {avg_loss}")
 
     def count_parameters(self):
         params_high = count_parameters(self.hypernetwork)
