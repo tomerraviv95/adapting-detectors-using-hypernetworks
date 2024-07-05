@@ -12,7 +12,7 @@ from python_code.plotting import *
 if __name__ == "__main__":
     params_list = [
         {'detector_type': 'rec_deepsic', 'training_type': 'Joint'},
-        # {'detector_type': 'rec_deepsic', 'training_type': 'Online'},
+        {'detector_type': 'rec_deepsic', 'training_type': 'Online'},
         {'detector_type': 'hyper_deepsic', 'training_type': 'Joint'},
     ]
     cost_snrs = [8, 10, 12, 14]
