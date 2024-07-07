@@ -21,13 +21,11 @@ class RecDeepSICTrainer(DeepSICTrainer):
 
     def _initialize_detector(self):
         # populate 1D list for Storing the DeepSIC Networks
-        # self.detector = torch.nn.ModuleDict()
-        # for user in range(2, MAX_USERS + 1):
-        #     cur_module_list = torch.nn.ModuleList(
-        #         [DeepSICDetector(user, self.hidden_size).to(DEVICE) for _ in range(user)])
-        #     self.detector.update({str(user): cur_module_list})
-        self.detector = {str(user): [DeepSICDetector(user, self.hidden_size).to(DEVICE) for _ in range(user)] for user
-                         in range(2, MAX_USERS + 1)}
+        self.detector = torch.nn.ModuleDict()
+        for user in range(2, MAX_USERS + 1):
+            cur_module_list = torch.nn.ModuleList(
+                [DeepSICDetector(user, self.hidden_size).to(DEVICE) for _ in range(user)])
+            self.detector.update({str(user): cur_module_list})
 
     def _soft_symbols_from_probs(self, input: torch.Tensor, user: int, detector_util: DetectorUtil,
                                  i: int = None) -> torch.Tensor:

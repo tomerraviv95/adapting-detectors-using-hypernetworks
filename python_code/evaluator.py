@@ -56,7 +56,7 @@ class Evaluator(object):
             detector_util = DetectorUtil(H_hat=[ls_channel_estimation(mx_pilots, rx_pilots) for mx_pilots, rx_pilots in
                                                 zip(message_words, received_words)])
             self.detector.train(message_words, received_words, detector_util)
-            # torch.save({'model_state_dict': self.detector.state_dict()}, self.weights_path)
+            torch.save({'model_state_dict': self.detector.state_dict()}, self.weights_path)
 
     def get_run_path(self):
         # the weights name

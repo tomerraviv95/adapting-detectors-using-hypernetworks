@@ -10,7 +10,7 @@ from python_code.utils.metrics import count_parameters
 class DeepSICTrainer(Detector):
 
     def __init__(self):
-        self.lr = HALF * 1e-3
+        self.lr = HALF * 1e-2
         self.iterations = 3
         self.hidden_size = HIDDEN_SIZE
         super().__init__()

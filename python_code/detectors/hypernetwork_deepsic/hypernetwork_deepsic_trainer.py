@@ -13,7 +13,7 @@ from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType, MAX_U
 from python_code.utils.metrics import count_parameters
 
 EPOCHS = 20
-N_REPEATS = 100
+BATCH_SIZE = 100
 
 
 class HypernetworkDeepSICTrainer(DeepSICTrainer):
@@ -74,7 +74,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         self.optimizer = torch.optim.Adam(total_parameters, lr=self.lr)
         for epoch in range(EPOCHS):
             print(f'Epoch {epoch + 1}/{EPOCHS}')
-            curr_batch = np.random.choice(len(hs), N_REPEATS)
+            curr_batch = np.random.choice(len(hs), BATCH_SIZE)
             total_loss = 0
             for i in curr_batch:
                 n_users = hs[i].shape[0]
