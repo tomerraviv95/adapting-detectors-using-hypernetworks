@@ -1,9 +1,14 @@
 import torch
 
 
-def ls_channel_estimation(mx_pilot: torch.Tensor, rx_pilot: torch.Tensor) -> torch.Tensor:
-    x, y = mx_pilot, rx_pilot.float()
+def ls_channel_estimation(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+    """
+    Least squares channel estimation
+    find solution to min||y = out * x||^2
+    A = (x^t * x), B = (x^t * y)
+    out_hat = A * B
+    """
     A = torch.linalg.inv(torch.matmul(x.T, x))
-    B = torch.matmul(x.T, y)
-    unnorm_H_hat = torch.abs(torch.matmul(A, B))
-    return unnorm_H_hat
+    B = torch.matmul(x.T, y.float())
+    out_hat = torch.abs(torch.matmul(A, B))
+    return out_hat

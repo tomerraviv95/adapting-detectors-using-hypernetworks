@@ -1,21 +1,18 @@
-from typing import List
-
 import torch
 
-from python_code import DEVICE, conf
+from python_code import DEVICE
 from python_code.datasets.communications_blocks.modulator import BPSKModulator
 from python_code.detectors.detector_trainer import Detector
-from python_code.utils.constants import HIDDEN_SIZES_DICT, TRAINING_TYPES_DICT
+from python_code.utils.constants import HIDDEN_SIZE, HALF, DetectorUtil
 from python_code.utils.metrics import count_parameters
 
 
 class DeepSICTrainer(Detector):
 
     def __init__(self):
-        self.lr = 5e-3
+        self.lr = HALF * 1e-3
         self.iterations = 3
-        self.hidden_size = HIDDEN_SIZES_DICT[TRAINING_TYPES_DICT[conf.training_type]]
-        self.prev_users = 0
+        self.hidden_size = HIDDEN_SIZE
         super().__init__()
 
     def __str__(self):
@@ -31,7 +28,7 @@ class DeepSICTrainer(Detector):
         return self.criterion(input=est, target=mx.long())
 
     def _symbols_from_prob(self, probs_vec: torch.Tensor) -> torch.Tensor:
-        symbols_word = torch.sign(probs_vec - 0.5)
+        symbols_word = torch.sign(probs_vec - HALF)
         detected_words = BPSKModulator.demodulate(symbols_word)
         return detected_words
 
@@ -49,7 +46,8 @@ class DeepSICTrainer(Detector):
             rx_all.append(current_y_train)
         return mx_all, rx_all
 
-    def _calculate_posteriors(self, i: int, probs_vec: torch.Tensor, rx: torch.Tensor, snrs_list=None) -> torch.Tensor:
+    def _calculate_posteriors(self, i: int, probs_vec: torch.Tensor, rx: torch.Tensor,
+                              detector_util: DetectorUtil = None) -> torch.Tensor:
         """
         Propagates the probabilities through the learnt networks for a single iteration.
         """
@@ -58,28 +56,23 @@ class DeepSICTrainer(Detector):
             idx = [user_i for user_i in range(probs_vec.shape[1]) if user_i != user]
             input = torch.cat((rx, probs_vec[:, idx].reshape(rx.shape[0], -1)), dim=1)
             with torch.no_grad():
-                output = self._soft_symbols_from_probs(input, user, hs=snrs_list, i=i)
+                output = self._soft_symbols_from_probs(input, user, detector_util, i)
             next_probs_vec[:, user] = output[:, 1:].reshape(next_probs_vec[:, user].shape)
         return next_probs_vec
 
-    def forward(self, rx: torch.Tensor, snrs_list: List[List[float]] = None, n_user=None) -> torch.Tensor:
+    def forward(self, rx: torch.Tensor, detector_util: DetectorUtil) -> torch.Tensor:
         with torch.no_grad():
             # detect and decode
             # initialize the states of new users entering the network
-            self.adapt_network(n_user)
-            probs_vec = 0.5 * torch.ones([rx.shape[0], n_user]).to(DEVICE).float()
+            probs_vec = HALF * torch.ones([rx.shape[0], detector_util.n_users]).to(DEVICE).float()
             for i in range(self.iterations):
-                probs_vec = self._calculate_posteriors(i + 1, probs_vec, rx, snrs_list)
+                probs_vec = self._calculate_posteriors(i + 1, probs_vec, rx, detector_util)
             detected_words = self._symbols_from_prob(probs_vec)
-            self.prev_users = n_user
             return detected_words
-
-    def adapt_network(self, n_user: int):
-        pass
 
     def count_parameters(self):
         smallest_model = list(self.detector.values())[0][0]
         largest_model = list(self.detector.values())[-1][0]
         params_low = count_parameters(smallest_model)
         params_high = count_parameters(largest_model)
-        return params_low, params_high
+        print(f"Smallest module params: {params_low}, largest module params: {params_high}")

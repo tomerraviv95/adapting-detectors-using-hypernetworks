@@ -1,12 +1,11 @@
 import random
-from typing import Tuple
 
 import numpy as np
 import torch
 from torch import nn
 
 from python_code import conf
-from python_code.utils.constants import TRAINING_TYPES_DICT
+from python_code.utils.constants import TRAINING_TYPES_DICT, DetectorUtil
 
 random.seed(conf.seed)
 torch.manual_seed(conf.seed)
@@ -16,7 +15,7 @@ np.random.seed(conf.seed)
 
 class Detector(nn.Module):
     """
-    Implements the general symbols _detector
+    Sets the foundation for the general symbols detector
     """
 
     def __init__(self):
@@ -36,9 +35,6 @@ class Detector(nn.Module):
 
     # calculate train loss
     def _calc_loss(self, est: torch.Tensor, mx: torch.Tensor) -> torch.Tensor:
-        """
-         Every evaluater must have some loss calculation
-        """
         pass
 
     def _run_train_loop(self, est: torch.Tensor, mx: torch.Tensor) -> float:
@@ -51,16 +47,10 @@ class Detector(nn.Module):
         self.optimizer.step()
         return current_loss
 
-    def train(self, mx: torch.Tensor, rx: torch.Tensor, snrs_list=None):
-        """
-        Every _detector evaluater must have some function to adapt it Online
-        """
+    def train(self, mx: torch.Tensor, rx: torch.Tensor, detector_util: DetectorUtil):
         pass
 
-    def forward(self, rx: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-        """
-        Every evaluater must have some forward pass for its _detector
-        """
+    def forward(self, rx: torch.Tensor, detector_util: DetectorUtil) -> torch.Tensor:
         pass
 
     def count_parameters(self):

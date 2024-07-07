@@ -15,18 +15,12 @@ mpl.rcParams['font.family'] = 'STIXGeneral'
 
 COLORS_DICT = {'Hypernetwork-based DeepSIC': 'red',
                'Joint Recurrent DeepSIC': 'orange',
-               'Online Recurrent DeepSIC': 'blue',
-               'Online Sequential DeepSIC': 'green',
-               'Joint RNN Hypernetwork-based DeepSIC': 'black'}
+               'Online Recurrent DeepSIC': 'blue'}
 
 MARKERS_DICT = {'Hypernetwork-based DeepSIC': 'd',
                 'Joint Recurrent DeepSIC': 'd',
-                'Online Recurrent DeepSIC': 'x',
-                'Online Sequential DeepSIC': 'x',
-                'Joint RNN Hypernetwork-based DeepSIC': 'o'}
+                'Online Recurrent DeepSIC': 'x'}
 
 LINESTYLES_DICT = {'Hypernetwork-based DeepSIC': 'solid',
                    'Joint Recurrent DeepSIC': 'dotted',
-                   'Online Recurrent DeepSIC': 'solid',
-                   'Online Sequential DeepSIC': 'dotted',
-                   'Joint RNN Hypernetwork-based DeepSIC': 'solid'}
+                   'Online Recurrent DeepSIC': 'solid'}

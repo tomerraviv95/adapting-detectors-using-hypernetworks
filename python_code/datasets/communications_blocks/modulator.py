@@ -1,17 +1,18 @@
 import numpy as np
 import torch
 
+from python_code.utils.constants import HALF
+
 
 class BPSKModulator:
     @staticmethod
-    def modulate(c: np.ndarray) -> np.ndarray:
+    def modulate(m: np.ndarray) -> np.ndarray:
         """
         BPSK modulation 0->1, 1->-1
-        :param c: the binary codeword
+        :param m: the binary codeword
         :return: binary modulated signal
         """
-        x = 1 - 2 * c
-        return x
+        return 1 - 2 * m
 
     @staticmethod
     def demodulate(s: torch.Tensor) -> torch.Tensor:
@@ -21,4 +22,4 @@ class BPSKModulator:
         :param s: symbols vector
         :return: probabilities vector
         """
-        return 0.5 * (s + 1)
+        return HALF * (s + 1)
