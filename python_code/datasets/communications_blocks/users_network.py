@@ -6,7 +6,7 @@ NUMBER_OF_USERS_DICT_TRAIN = {(i, j): user for i, j, user in
                                         TRAINING_BLOCKS_PER_CONFIG),
                                   range(2, MAX_USERS + 1))}
 
-NUMBER_OF_USERS_DICT_TEST = {(0, 20): 4, (20, 40): 5, (40, 60): 6, (60, 80): 7, (80, 100): 8}
+NUMBER_OF_USERS_DICT_TEST = {(0, 20): 14, (20, 40): 15, (40, 60): 16, (60, 80): 17, (80, 100): 18}
 
 
 class UsersNetwork:

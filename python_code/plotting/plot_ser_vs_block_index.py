@@ -11,11 +11,11 @@ from python_code.plotting import *
 
 if __name__ == "__main__":
     params_list = [
-        {'detector_type': 'rec_deepsic', 'training_type': 'Joint', 'train_block_length': 1000},
-        {'detector_type': 'rec_deepsic', 'training_type': 'Online', 'train_block_length': 1000},
-        {'detector_type': 'hyper_deepsic', 'training_type': 'Joint', 'train_block_length': 7500},
+        {'detector_type': 'rec_deepsic', 'training_type': 'Joint'},
+        {'detector_type': 'rec_deepsic', 'training_type': 'Online'},
+        {'detector_type': 'hyper_deepsic', 'training_type': 'Joint'},
     ]
-    seeds = [1, 2, 3]
+    seeds = range(1, 4)
 
     # path for the saved figure
     current_day_time = datetime.now()

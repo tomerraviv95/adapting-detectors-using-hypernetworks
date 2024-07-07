@@ -1,8 +1,8 @@
 # general settings
 seed: 1 # run seed
-n_ant: 12 # number of received signals
+n_ant: 20 # number of received signals
 channel_type: 'COST' # ['SED','COST']
-cost_snr: 14 # the SNR for the cost scenario. Does not affect the SED channel.
+cost_snr: 10 # the SNR for the cost scenario. Does not affect the SED channel.
 detector_type: 'hyper_deepsic' # ['rec_deepsic','hyper_deepsic']
 training_type: 'Joint' # ['Joint','Online']
 # [True,False] If False then for COST/SED at test, train on COST/SED respectively. If True - mismatched train and test.
