@@ -16,11 +16,13 @@ class Transmitter:
 
     def transmit(self, s: np.ndarray, index: int, users: int) -> np.ndarray:
         if self.train_test_mismatch:
+            # if mismatch is True, set the training dataset to one opposite to the test channel
             cur_channel = COSTChannel if conf.channel_type == ChannelType.SED.name else SEDChannel
         else:
+            # otherwise not mismatch, the train and test channels match
             cur_channel = CHANNELS_DICT[conf.channel_type]
-        snrs = cur_channel.get_snrs(users, index, self.phase)
+        snrs_db = cur_channel.get_snrs(users, index, self.phase)
         H = cur_channel.get_channel_matrix(conf.n_ant, users, index, self.phase)
         # pass through datasets
-        rx = cur_channel.transmit(s=s, h=H, snrs=snrs)
+        rx = cur_channel.transmit(s=s, H=H, snrs_db=snrs_db)
         return rx

@@ -15,8 +15,8 @@ from python_code.utils.constants import Phase
 
 class ChannelModelDataset(Dataset):
     """
-    Dataset object for the datasets. Used in training and evaluation.
-    Returns (transmitted, received, channel_coefficients) batch.
+    Dataset object for the training and test generation. Used in training and evaluation.
+    Returns (transmitted, received) batch.
     """
 
     def __init__(self, block_length: int, blocks_num: int, pilots_length: int, phase: Phase):
@@ -32,7 +32,7 @@ class ChannelModelDataset(Dataset):
             database = []
         mx_full = []
         rx_full = np.empty((self.blocks_num, self.block_length, conf.n_ant))
-        # accumulate words until reaches desired number
+        # accumulate pairs of transmitted and received words
         for index in range(self.blocks_num):
             users = self.users_network.get_current_users(index)
             mx = self.generator.generate(users)
@@ -41,7 +41,6 @@ class ChannelModelDataset(Dataset):
             # accumulate
             mx_full.append(mx)
             rx_full[index] = rx
-
         database.append((mx_full, rx_full))
 
     def __getitem__(self) -> Tuple[List[torch.Tensor], torch.Tensor]:

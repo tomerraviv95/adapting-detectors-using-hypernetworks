@@ -49,20 +49,20 @@ class SEDChannel:
         return H
 
     @staticmethod
-    def transmit(s: np.ndarray, h: np.ndarray, snrs_db: np.ndarray) -> np.ndarray:
+    def transmit(s: np.ndarray, H: np.ndarray, snrs_db: np.ndarray) -> np.ndarray:
         """
         The MIMO SED Channel
         :param s: to transmit symbol words
         :param snrs_db: signal-to-noise value per user in db
-        :param h: channel coefficients
+        :param H: channel coefficients
         :return: received word
         """
         snrs = 10 ** (snrs_db / 20)
-        snrs_mat = np.eye(h.shape[0])
+        snrs_mat = np.eye(H.shape[0])
         for i in range(len(snrs_mat)):
             snrs_mat[i, i] = snrs[i]
         # Users X antennas matrix. Scale each row by the TRAIN_SNR of the given user.
-        snrs_scaled_h = np.matmul(snrs_mat, h)
+        snrs_scaled_h = np.matmul(snrs_mat, H)
         conv = np.matmul(s, snrs_scaled_h)
         w = np.random.randn(s.shape[0], conf.n_ant)
         y = conv + w
