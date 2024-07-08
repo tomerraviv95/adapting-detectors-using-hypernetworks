@@ -15,7 +15,7 @@ np.random.seed(conf.seed)
 
 class Detector(nn.Module):
     """
-    Sets the foundation for the general symbols detector
+    The general symbols detector
     """
 
     def __init__(self):

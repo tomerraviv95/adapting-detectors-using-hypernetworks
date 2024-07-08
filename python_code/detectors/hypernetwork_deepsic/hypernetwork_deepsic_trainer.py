@@ -42,9 +42,9 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
     def _soft_symbols_from_probs(self, input: torch.Tensor, user: int, detector_util: DetectorUtil,
                                  i: int) -> torch.Tensor:
         if i == 1:
+            # set the generated weights to the base network in the first iteration
             context_embedding = self._get_context_embedding(detector_util.H_hat, user)
             self.inference_weights[user] = self.hypernetwork(context_embedding)
-        # Set the generated weights to the base network in the forward pass of deepsic
         hyper_input = input.float()
         padding = torch.zeros([hyper_input.shape[0], MAX_USERS - detector_util.H_hat.shape[0]]).to(DEVICE)
         hyper_input = torch.cat([hyper_input, padding], dim=1)
@@ -66,7 +66,7 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         return context_embedding
 
     def train(self, message_words: torch.Tensor, received_words: torch.Tensor, detector_util: DetectorUtil):
-        hs = detector_util.H_hat
+        H_hat = detector_util.H_hat
         self.criterion = torch.nn.CrossEntropyLoss()
         total_parameters = self.hypernetwork.parameters()
         total_parameters = chain(total_parameters, self.this_user_vec.parameters())
@@ -74,21 +74,21 @@ class HypernetworkDeepSICTrainer(DeepSICTrainer):
         self.optimizer = torch.optim.Adam(total_parameters, lr=self.lr)
         for epoch in range(EPOCHS):
             print(f'Epoch {epoch + 1}/{EPOCHS}')
-            curr_batch = np.random.choice(len(hs), BATCH_SIZE)
+            curr_batch = np.random.choice(len(H_hat), BATCH_SIZE)
             total_loss = 0
             for i in curr_batch:
-                n_users = hs[i].shape[0]
+                n_users = H_hat[i].shape[0]
                 for user in range(n_users):
                     mx, rx = message_words[i], received_words[i]
-                    h = hs[i]
-                    # Obtaining the DeepSIC networks for each user-symbol and the i-th iteration
+                    h = H_hat[i]
+                    # obtaining the DeepSIC networks for each user-symbol and the i-th iteration
                     probs_vec = torch.rand(mx.shape).to(DEVICE)
                     mx_all, rx_all = self._prepare_data_for_training(mx, rx, probs_vec)
                     # get the context embedding for the hypernetwork based on the user and snrs
                     context_embedding = self._get_context_embedding(h, user)
-                    # Forward pass through the hypernetwork to generate weights
+                    # forward pass through the hypernetwork to generate weights
                     weights = self.hypernetwork(context_embedding)
-                    # Set the generated weights to the base network in the forward pass of deepsic
+                    # set the generated weights to the base network in the forward pass of deepsic
                     hyper_input = rx_all[user].float()
                     padding = torch.zeros([hyper_input.shape[0], MAX_USERS - h.shape[0]]).to(DEVICE)
                     hyper_input = torch.cat([hyper_input, padding], dim=1)

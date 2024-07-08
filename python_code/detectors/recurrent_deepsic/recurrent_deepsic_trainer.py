@@ -12,6 +12,9 @@ EPOCHS = 50
 
 
 class RecDeepSICTrainer(DeepSICTrainer):
+    """
+    Weights-tied version (across multiple iterations) of the DeepSIC receiver
+    """
 
     def __init__(self):
         super().__init__()
@@ -20,7 +23,8 @@ class RecDeepSICTrainer(DeepSICTrainer):
         return TRAINING_TYPES_DICT[conf.training_type].name + ' Recurrent DeepSIC'
 
     def _initialize_detector(self):
-        # populate 1D list for Storing the DeepSIC Networks
+        # Populate dict of lists of DeepSIC modules. Each key in the dictionary corresponds to a single configuration
+        # of K[t] users. The values are the weights, a list of K[t] parameter vectors, one per user.
         self.detector = torch.nn.ModuleDict()
         for user in range(2, MAX_USERS + 1):
             cur_module_list = torch.nn.ModuleList(
@@ -44,8 +48,8 @@ class RecDeepSICTrainer(DeepSICTrainer):
             soft_estimation = single_model(rx.float())
             self._run_train_loop(soft_estimation, mx)
 
-    def train_models(self, model: List[DeepSICDetector], mx_all: List[List[torch.Tensor]],
-                     rx_all: List[List[torch.Tensor]], n_user):
+    def _train_models(self, model: nn.Module, mx_all: List[List[torch.Tensor]], rx_all: List[List[torch.Tensor]],
+                      n_user: int):
         for user in range(n_user):
             self.train_model(model[user], [mx_all[i][user] for i in range(len(mx_all))],
                              [rx_all[i][user] for i in range(len(rx_all))])
@@ -66,4 +70,4 @@ class RecDeepSICTrainer(DeepSICTrainer):
                       relevant_ind_pairs]
             mx_per_user, rx_per_user = list(zip(*[self._prepare_data_for_training(*cur_tuple) for cur_tuple in tuples]))
             # Training the DeepSIC networks
-            self.train_models(self.detector[str(n_user)], mx_per_user, rx_per_user, n_user)
+            self._train_models(self.detector[str(n_user)], mx_per_user, rx_per_user, n_user)

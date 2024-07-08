@@ -9,6 +9,10 @@ EMB = 64
 
 
 class Hypernetwork(nn.Module):
+    """
+    The weights generation network, see Figure 2 in the paper
+    """
+
     def __init__(self, input_size: int, parameters_num: List[int]):
         super(Hypernetwork, self).__init__()
         self.activation = nn.ReLU()

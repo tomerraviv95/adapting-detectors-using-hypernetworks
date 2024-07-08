@@ -11,7 +11,7 @@ conf = Config()
 
 class HyperDeepSICDetector(nn.Module):
     """
-    The Hyper DeepSIC Network Architecture
+    The hypernetwork version of DeepSIC
 
     ===========Architecture=========
     DeepSICNet(

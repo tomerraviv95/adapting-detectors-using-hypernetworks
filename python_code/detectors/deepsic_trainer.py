@@ -23,7 +23,7 @@ class DeepSICTrainer(Detector):
 
     def _calc_loss(self, est: torch.Tensor, mx: torch.IntTensor) -> torch.Tensor:
         """
-        Cross Entropy loss - distribution over states versus the gt state label
+        Cross entropy loss - distribution over states versus the gt state label
         """
         return self.criterion(input=est, target=mx.long())
 
@@ -61,12 +61,16 @@ class DeepSICTrainer(Detector):
         return next_probs_vec
 
     def forward(self, rx: torch.Tensor, detector_util: DetectorUtil) -> torch.Tensor:
+        """
+        Detects the batch of received words -> estimated transmitted words
+        """
         with torch.no_grad():
-            # detect and decode
             # initialize the states of new users entering the network
             probs_vec = HALF * torch.ones([rx.shape[0], detector_util.n_users]).to(DEVICE).float()
+            # detect using all iterations
             for i in range(self.iterations):
                 probs_vec = self._calculate_posteriors(i + 1, probs_vec, rx, detector_util)
+            # get symbols from probs
             detected_words = self._symbols_from_prob(probs_vec)
             return detected_words
 
