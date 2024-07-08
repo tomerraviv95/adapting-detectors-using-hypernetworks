@@ -22,34 +22,39 @@ class COSTChannel:
 
     @staticmethod
     def get_channel_matrix(n_ant: int, n_user: int, index: int, phase: Phase) -> np.ndarray:
+        # load the channel coefficients
         total_h = np.empty([n_user, n_ant])
         for i in range(1, n_ant + 1):
             if phase == Phase.TRAIN:
+                # train using 20 different channels
                 channel = 1 + index // TRAINING_BLOCKS_PER_CONFIG
                 path_to_ant_mat = os.path.join(COST2100_TRAIN_DIR, f'channel_{channel}_ant_{i}.mat')
             else:
+                # test on channel 0
                 path_to_ant_mat = os.path.join(COST2100_TEST_DIR, f'channel_0_ant_{i}.mat')
             total_h_user = scipy.io.loadmat(path_to_ant_mat)['h_omni_power']
+            # assume max and min threshold for the analog power reception
             norm_h_user = (total_h_user - MIN_POWER) / (MAX_POWER - MIN_POWER)
+            # only take the channel coefs up to the current online users
             cur_h_user = norm_h_user[:n_user, index % TRAINING_BLOCKS_PER_CONFIG]
             total_h[:, i - 1] = SCALING_COEF * cur_h_user  # reduce side-lobes via beamforming
         # beamforming (beam focusing) for each user
         total_h[np.arange(n_user), np.arange(n_user)] = 1
         if np.any(total_h < 0) or np.any(total_h > 1):
-            print('Error in the normalization of the channel! values either smaller than 0 or larger than 1')
+            print('Error in the normalization of the channel! values out of range')
             raise ValueError('Fail')
         return total_h
 
     @staticmethod
-    def transmit(s: np.ndarray, h: np.ndarray, snrs: np.ndarray) -> np.ndarray:
+    def transmit(s: np.ndarray, h: np.ndarray, snrs_db: np.ndarray) -> np.ndarray:
         """
         The MIMO COST2100 Channel
         :param s: to transmit symbol words
-        :param snr: signal-to-noise value
+        :param snrs_db: signal-to-noise value per user in db
         :param h: channel coefficients
         :return: received word
         """
-        snrs = 10 ** (snrs / 20)
+        snrs = 10 ** (snrs_db / 20)
         snrs_mat = np.eye(h.shape[0])
         for i in range(len(snrs_mat)):
             snrs_mat[i, i] = snrs[i]

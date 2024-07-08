@@ -49,15 +49,15 @@ class SEDChannel:
         return H
 
     @staticmethod
-    def transmit(s: np.ndarray, h: np.ndarray, snrs: np.ndarray) -> np.ndarray:
+    def transmit(s: np.ndarray, h: np.ndarray, snrs_db: np.ndarray) -> np.ndarray:
         """
         The MIMO SED Channel
         :param s: to transmit symbol words
-        :param snrs: signal-to-noise value per user
-        :param h: channel matrix function
-        :return: received word y
+        :param snrs_db: signal-to-noise value per user in db
+        :param h: channel coefficients
+        :return: received word
         """
-        snrs = 10 ** (snrs / 20)
+        snrs = 10 ** (snrs_db / 20)
         snrs_mat = np.eye(h.shape[0])
         for i in range(len(snrs_mat)):
             snrs_mat[i, i] = snrs[i]
