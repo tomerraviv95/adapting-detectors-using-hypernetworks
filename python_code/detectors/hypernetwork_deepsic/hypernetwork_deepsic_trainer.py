@@ -5,8 +5,8 @@ import torch
 from torch.nn import Embedding
 
 from python_code import DEVICE, conf
-from python_code.detectors.deepsic_detector import DeepSICDetector
-from python_code.detectors.deepsic_trainer import DeepSICTrainer
+from python_code.detectors.deepsic.deepsic_detector import DeepSICDetector
+from python_code.detectors.trainer import Trainer
 from python_code.detectors.hypernetwork_deepsic.hyper_deepsic import HyperDeepSICDetector
 from python_code.detectors.hypernetwork_deepsic.hypernetwork import Hypernetwork
 from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType, MAX_USERS, HIDDEN_SIZE, DetectorUtil
@@ -16,7 +16,7 @@ EPOCHS = 20
 BATCH_SIZE = 100
 
 
-class HypernetworkDeepSICTrainer(DeepSICTrainer):
+class HypernetworkTrainer(Trainer):
 
     def __init__(self):
         super().__init__()

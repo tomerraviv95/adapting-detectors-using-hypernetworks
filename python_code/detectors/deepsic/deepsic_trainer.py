@@ -4,14 +4,14 @@ import torch
 from torch import nn
 
 from python_code import DEVICE, conf
-from python_code.detectors.deepsic_detector import DeepSICDetector
-from python_code.detectors.deepsic_trainer import DeepSICTrainer
+from python_code.detectors.deepsic.deepsic_detector import DeepSICDetector
+from python_code.detectors.trainer import Trainer
 from python_code.utils.constants import TRAINING_TYPES_DICT, MAX_USERS, DetectorUtil
 
 EPOCHS = 50
 
 
-class RecDeepSICTrainer(DeepSICTrainer):
+class DeepSICTrainer(Trainer):
     """
     Weights-tied version (across multiple iterations) of the DeepSIC receiver
     """
@@ -20,7 +20,7 @@ class RecDeepSICTrainer(DeepSICTrainer):
         super().__init__()
 
     def __str__(self):
-        return TRAINING_TYPES_DICT[conf.training_type].name + ' Recurrent DeepSIC'
+        return TRAINING_TYPES_DICT[conf.training_type].name + ' DeepSIC'
 
     def _initialize_detector(self):
         # Populate dict of lists of DeepSIC modules. Each key in the dictionary corresponds to a single configuration

@@ -1,19 +1,25 @@
 import torch
+from torch import nn
 
 from python_code import DEVICE
+from python_code import conf
 from python_code.datasets.communications_blocks.modulator import BPSKModulator
-from python_code.detectors.detector_trainer import Detector
 from python_code.utils.constants import HIDDEN_SIZE, HALF, DetectorUtil
+from python_code.utils.constants import TRAINING_TYPES_DICT
 from python_code.utils.metrics import count_parameters
 
 
-class DeepSICTrainer(Detector):
+class Trainer(nn.Module):
 
     def __init__(self):
         self.lr = HALF * 1e-2
         self.iterations = 3
         self.hidden_size = HIDDEN_SIZE
         super().__init__()
+        self._initialize_detector()
+        self.softmax = torch.nn.Softmax(dim=1)
+        self.training_type = TRAINING_TYPES_DICT[conf.training_type]
+
 
     def __str__(self):
         return 'DeepSIC'
@@ -80,3 +86,13 @@ class DeepSICTrainer(Detector):
         params_low = count_parameters(smallest_model)
         params_high = count_parameters(largest_model)
         print(f"Smallest module params: {params_low}, largest module params: {params_high}")
+
+    def _run_train_loop(self, est: torch.Tensor, mx: torch.Tensor) -> float:
+        # calculate loss
+        loss = self._calc_loss(est=est, mx=mx)
+        current_loss = loss.item()
+        # back propagation
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+        return current_loss

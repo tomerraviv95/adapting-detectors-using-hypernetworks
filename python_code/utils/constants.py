@@ -5,8 +5,7 @@ from python_code import conf
 
 
 class DetectorType(Enum):
-    seq_deepsic = 'seq_deepsic'
-    rec_deepsic = 'rec_deepsic'
+    deepsic = 'deepsic'
     hyper_deepsic = 'hyper_deepsic'
 
 

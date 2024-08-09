@@ -11,8 +11,8 @@ from python_code.plotting import *
 
 if __name__ == "__main__":
     params_list = [
-        {'detector_type': 'rec_deepsic', 'training_type': 'Joint'},
-        {'detector_type': 'rec_deepsic', 'training_type': 'Online'},
+        {'detector_type': 'deepsic', 'training_type': 'Joint'},
+        {'detector_type': 'deepsic', 'training_type': 'Online'},
         {'detector_type': 'hyper_deepsic', 'training_type': 'Joint'},
     ]
     pilot_sizes = [400, 800, 1200, 1600, 2000]
