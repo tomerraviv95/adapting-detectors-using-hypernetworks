@@ -10,8 +10,8 @@ from python_code import conf
 from python_code.datasets.channel_dataset import ChannelModelDataset
 from python_code.detectors import DETECTORS_TYPE_DICT
 from python_code.utils.channel_estimate import ls_channel_estimation
-from python_code.utils.constants import Phase, TrainingType, MAX_USERS, TRAINING_BLOCKS_PER_CONFIG, \
-    ChannelType, DetectorUtil
+from python_code.utils.constants import Phase, MAX_USERS, TRAINING_BLOCKS_PER_CONFIG, \
+    ChannelType, DetectorUtil, DetectorType
 from python_code.utils.metrics import calculate_error_rate
 
 random.seed(conf.seed)
@@ -38,7 +38,7 @@ class Evaluator(object):
                                                         pilots_length=conf.test_pilots_length,
                                                         phase=Phase.TEST)
         # if training is offline, either load the weights or train the detector for this config
-        if conf.training_type == 'Joint':
+        if conf.detector_type in [DetectorType.joint_deepsic.name, DetectorType.hyper_deepsic.name]:
             if not os.path.isdir(WEIGHTS_DIR):
                 os.makedirs(WEIGHTS_DIR)
             run_path = self.get_run_path()
@@ -60,7 +60,7 @@ class Evaluator(object):
 
     def get_run_path(self):
         # the weights name
-        run_name = conf.detector_type + "_" + conf.training_type + "_" + str(conf.n_ant) + "_"
+        run_name = conf.detector_type + "_" + str(conf.n_ant) + "_"
         if (not conf.train_test_mismatch and conf.channel_type == ChannelType.SED.name) or \
                 (conf.train_test_mismatch and conf.channel_type == ChannelType.COST.name):
             run_name += ChannelType.SED.name
@@ -89,10 +89,10 @@ class Evaluator(object):
             mx_pilot, rx_pilot = mx[:conf.test_pilots_length], rx[:conf.test_pilots_length]
             mx_data, rx_data = mx[conf.test_pilots_length:], rx[conf.test_pilots_length:]
             # ---------------------------------------------------------
-            # Online training - as in the config "training_type" option
-            if self.detector.training_type == TrainingType.Online:
+            # Online training
+            if conf.detector_type == DetectorType.online_deepsic.name:
                 # run online training on the pilots part
-                self.detector.train([mx_pilot], [rx_pilot])
+                self.detector.train(mx_pilot, rx_pilot)
             detector_util = DetectorUtil(H_hat=ls_channel_estimation(mx_pilot, rx_pilot), n_users=mx_pilot.shape[1])
             # ---------------------------------------------------------
             # detect data part after training on the pilot part

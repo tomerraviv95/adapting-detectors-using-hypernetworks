@@ -14,13 +14,13 @@ mpl.rcParams['mathtext.fontset'] = 'stix'
 mpl.rcParams['font.family'] = 'STIXGeneral'
 
 COLORS_DICT = {'Hypernetwork-based DeepSIC': 'red',
-               'Joint Recurrent DeepSIC': 'orange',
-               'Online Recurrent DeepSIC': 'blue'}
+               'Joint DeepSIC': 'orange',
+               'Online DeepSIC': 'blue'}
 
 MARKERS_DICT = {'Hypernetwork-based DeepSIC': 'd',
-                'Joint Recurrent DeepSIC': 'd',
-                'Online Recurrent DeepSIC': 'x'}
+                'Joint DeepSIC': 'd',
+                'Online DeepSIC': 'x'}
 
 LINESTYLES_DICT = {'Hypernetwork-based DeepSIC': 'solid',
-                   'Joint Recurrent DeepSIC': 'dotted',
-                   'Online Recurrent DeepSIC': 'solid'}
+                   'Joint DeepSIC': 'dotted',
+                   'Online DeepSIC': 'solid'}

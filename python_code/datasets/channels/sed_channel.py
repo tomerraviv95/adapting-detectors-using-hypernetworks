@@ -12,9 +12,9 @@ TRAIN_SNR_PER_USER = [
 ]
 
 TEST_SNR = 10
-COEF = 12 / 10
+COEF = 14 / 10
 TEST_SNR_PER_USER = [
-    (TEST_SNR, COEF * TEST_SNR, 10 * (i + 1)) for i in range(MAX_USERS)
+    (TEST_SNR, COEF * TEST_SNR, 2 * (i + 1)) for i in range(MAX_USERS)
 ]
 
 SNR_PER_USER_DICT = {Phase.TRAIN: TRAIN_SNR_PER_USER, Phase.TEST: TEST_SNR_PER_USER}

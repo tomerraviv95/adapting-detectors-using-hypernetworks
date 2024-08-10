@@ -4,16 +4,15 @@ import numpy as np
 import torch
 from torch.nn import Embedding
 
-from python_code import DEVICE, conf
+from python_code import DEVICE
 from python_code.detectors.deepsic.deepsic_detector import DeepSICDetector
-from python_code.detectors.trainer import Trainer
 from python_code.detectors.hypernetwork_deepsic.hyper_deepsic import HyperDeepSICDetector
 from python_code.detectors.hypernetwork_deepsic.hypernetwork import Hypernetwork
-from python_code.utils.constants import TRAINING_TYPES_DICT, TrainingType, MAX_USERS, HIDDEN_SIZE, DetectorUtil
+from python_code.detectors.trainer import Trainer
+from python_code.utils.constants import MAX_USERS, HIDDEN_SIZE, DetectorUtil
 from python_code.utils.metrics import count_parameters
 
-EPOCHS = 20
-BATCH_SIZE = 100
+BATCH_SIZE = 128
 
 
 class HypernetworkTrainer(Trainer):
@@ -21,10 +20,9 @@ class HypernetworkTrainer(Trainer):
     def __init__(self):
         super().__init__()
         self.lr = 1e-4
+        self.epochs = 30
         self.train_context_embedding = []
         self.test_context_embedding = []
-        if TRAINING_TYPES_DICT[conf.training_type] == TrainingType.Online:
-            raise ValueError("Online training is not implemented for this detector!!!")
 
     def __str__(self):
         return 'Hypernetwork-based DeepSIC'
@@ -72,8 +70,8 @@ class HypernetworkTrainer(Trainer):
         total_parameters = chain(total_parameters, self.this_user_vec.parameters())
         total_parameters = chain(total_parameters, self.no_user_vec.parameters())
         self.optimizer = torch.optim.Adam(total_parameters, lr=self.lr)
-        for epoch in range(EPOCHS):
-            print(f'Epoch {epoch + 1}/{EPOCHS}')
+        for epoch in range(self.epochs):
+            print(f'Epoch {epoch + 1}/{self.epochs}')
             curr_batch = np.random.choice(len(H_hat), BATCH_SIZE)
             total_loss = 0
             for i in curr_batch:

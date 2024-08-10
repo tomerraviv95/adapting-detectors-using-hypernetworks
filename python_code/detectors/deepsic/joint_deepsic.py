@@ -3,24 +3,24 @@ from typing import List
 import torch
 from torch import nn
 
-from python_code import DEVICE, conf
+from python_code import DEVICE
 from python_code.detectors.deepsic.deepsic_detector import DeepSICDetector
 from python_code.detectors.trainer import Trainer
-from python_code.utils.constants import TRAINING_TYPES_DICT, MAX_USERS, DetectorUtil
-
-EPOCHS = 50
+from python_code.utils.constants import MAX_USERS, DetectorUtil
 
 
-class DeepSICTrainer(Trainer):
+class JointDeepSICTrainer(Trainer):
     """
     Weights-tied version (across multiple iterations) of the DeepSIC receiver
     """
 
     def __init__(self):
+        self.lr = 1e-3
+        self.epochs = 500
         super().__init__()
 
     def __str__(self):
-        return TRAINING_TYPES_DICT[conf.training_type].name + ' DeepSIC'
+        return 'Joint DeepSIC'
 
     def _initialize_detector(self):
         # Populate dict of lists of DeepSIC modules. Each key in the dictionary corresponds to a single configuration
@@ -44,7 +44,7 @@ class DeepSICTrainer(Trainer):
         single_model = single_model.to(DEVICE)
         mx = torch.cat(mx)
         rx = torch.cat(rx)
-        for _ in range(EPOCHS):
+        for _ in range(self.epochs):
             soft_estimation = single_model(rx.float())
             self._run_train_loop(soft_estimation, mx)
 

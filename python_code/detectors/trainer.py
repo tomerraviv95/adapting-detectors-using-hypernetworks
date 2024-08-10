@@ -2,24 +2,19 @@ import torch
 from torch import nn
 
 from python_code import DEVICE
-from python_code import conf
 from python_code.datasets.communications_blocks.modulator import BPSKModulator
 from python_code.utils.constants import HIDDEN_SIZE, HALF, DetectorUtil
-from python_code.utils.constants import TRAINING_TYPES_DICT
 from python_code.utils.metrics import count_parameters
 
 
 class Trainer(nn.Module):
 
     def __init__(self):
-        self.lr = HALF * 1e-2
         self.iterations = 3
         self.hidden_size = HIDDEN_SIZE
         super().__init__()
         self._initialize_detector()
         self.softmax = torch.nn.Softmax(dim=1)
-        self.training_type = TRAINING_TYPES_DICT[conf.training_type]
-
 
     def __str__(self):
         return 'DeepSIC'
@@ -96,3 +91,16 @@ class Trainer(nn.Module):
         loss.backward()
         self.optimizer.step()
         return current_loss
+
+    def train_model(self, single_model: nn.Module, tx: torch.Tensor, rx: torch.Tensor):
+        """
+        Trains a DeepSIC Network
+        """
+        self.optimizer = torch.optim.Adam(single_model.parameters(), lr=self.lr)
+        self.criterion = torch.nn.CrossEntropyLoss()
+        single_model = single_model.to(DEVICE)
+        loss = 0
+        for _ in range(self.epochs):
+            soft_estimation = single_model(rx.float())
+            current_loss = self._run_train_loop(soft_estimation, tx)
+            loss += current_loss

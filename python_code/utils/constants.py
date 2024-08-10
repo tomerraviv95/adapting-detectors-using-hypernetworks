@@ -5,18 +5,14 @@ from python_code import conf
 
 
 class DetectorType(Enum):
-    deepsic = 'deepsic'
+    online_deepsic = 'online_deepsic'
+    joint_deepsic = 'joint_deepsic'
     hyper_deepsic = 'hyper_deepsic'
 
 
 class Phase(Enum):
     TRAIN = 'TRAIN'
     TEST = 'TEST'
-
-
-class TrainingType(Enum):
-    Joint = 'Joint'
-    Online = 'Online'
 
 
 class ChannelType(Enum):
@@ -26,7 +22,6 @@ class ChannelType(Enum):
 
 DetectorUtil = namedtuple("DetectorUtil", "H_hat n_users", defaults=[None, None])
 
-TRAINING_TYPES_DICT = {'Joint': TrainingType.Joint, 'Online': TrainingType.Online}
 HIDDEN_SIZE = 16
 MAX_USERS = conf.n_ant
 TRAINING_BLOCKS_PER_CONFIG = 100  # Number of training blocks per user number. Only used in offline training.
