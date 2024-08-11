@@ -19,8 +19,8 @@ class HypernetworkTrainer(Trainer):
 
     def __init__(self):
         super().__init__()
-        self.lr = 1e-4
-        self.epochs = 30
+        self.lr = 5e-4
+        self.epochs = 25
         self.train_context_embedding = []
         self.test_context_embedding = []
 

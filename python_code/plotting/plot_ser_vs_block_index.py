@@ -11,11 +11,11 @@ from python_code.plotting import *
 
 if __name__ == "__main__":
     params_list = [
-        {'detector_type': 'deepsic', 'training_type': 'Joint'},
-        {'detector_type': 'deepsic', 'training_type': 'Online'},
-        {'detector_type': 'hyper_deepsic', 'training_type': 'Joint'},
+        {'detector_type': 'joint_deepsic'},
+        {'detector_type': 'online_deepsic'},
+        {'detector_type': 'hyper_deepsic'},
     ]
-    seeds = range(1, 4)
+    seeds = range(1, 2)
 
     # path for the saved figure
     current_day_time = datetime.now()
@@ -45,6 +45,7 @@ if __name__ == "__main__":
     plt.grid(which='both', ls='--')
     leg = plt.legend(loc='lower right', prop={'size': 20}, handlelength=4)
     plt.yscale('log')
+    plt.ylim(bottom=1e-4)
     plt.savefig(os.path.join(FIGURES_DIR, folder_name, f'ser_{conf.n_ant}.png'),
                 bbox_inches='tight')
     plt.show()

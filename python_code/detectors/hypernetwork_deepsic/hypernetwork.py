@@ -5,7 +5,7 @@ from torch import nn
 
 from python_code.utils.constants import MAX_USERS
 
-EMB = 64
+EMB = 128
 
 
 class Hypernetwork(nn.Module):

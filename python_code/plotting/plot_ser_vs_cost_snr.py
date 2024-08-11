@@ -11,12 +11,12 @@ from python_code.plotting import *
 
 if __name__ == "__main__":
     params_list = [
-        {'detector_type': 'deepsic', 'training_type': 'Joint'},
-        {'detector_type': 'deepsic', 'training_type': 'Online'},
-        {'detector_type': 'hyper_deepsic', 'training_type': 'Joint'},
+        {'detector_type': 'joint_deepsic'},
+        {'detector_type': 'online_deepsic'},
+        {'detector_type': 'hyper_deepsic'},
     ]
-    cost_snrs = [8, 10, 12, 14]
-    seeds = range(1, 4)
+    cost_snrs = [10, 12, 14, 16]
+    seeds = range(1, 2)
 
     # path for the saved figure
     current_day_time = datetime.now()

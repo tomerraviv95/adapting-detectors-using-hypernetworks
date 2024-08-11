@@ -8,7 +8,7 @@ NUMBER_OF_USERS_DICT_TRAIN = {(i, j): user for i, j, user in
 
 # Dict that describes the number of users in a sequence of blocks.
 # Each key is (begin_block,end_block) with n_users value, such that users=n_users where begin_block <= t < end_block.
-NUMBER_OF_USERS_DICT_TEST = {(0, 20): 4, (20, 40): 5, (40, 60): 6, (60, 80): 7, (80, 100): 8}
+NUMBER_OF_USERS_DICT_TEST = {(0, 20): 14, (20, 40): 15, (40, 60): 16, (60, 80): 17, (80, 100): 18}
 
 
 class UsersNetwork:
