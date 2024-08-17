@@ -5,10 +5,10 @@ import numpy as np
 from python_code import conf
 from python_code.utils.constants import Phase, MAX_USERS
 
-TRAIN_SNR = 4
-COEF = 16 / 4
+TRAIN_SNR = 6
+COEF = 16 / 6
 TRAIN_SNR_PER_USER = [
-    (TRAIN_SNR, COEF * TRAIN_SNR, random.randint(10, 200)) for _ in range(MAX_USERS)
+    (TRAIN_SNR, COEF * TRAIN_SNR, random.randint(10, 100)) for _ in range(MAX_USERS)
 ]
 
 TEST_SNR = 8

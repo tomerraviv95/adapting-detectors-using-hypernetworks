@@ -9,10 +9,10 @@ from python_code.detectors.deepsic.deepsic_detector import DeepSICDetector
 from python_code.detectors.hypernetwork_deepsic.hyper_deepsic import HyperDeepSICDetector
 from python_code.detectors.hypernetwork_deepsic.hypernetwork import Hypernetwork
 from python_code.detectors.trainer import Trainer
-from python_code.utils.constants import MAX_USERS, HIDDEN_SIZE, DetectorUtil
+from python_code.utils.constants import MAX_USERS, HIDDEN_SIZE, DetectorUtil, TRAINING_BLOCKS_PER_CONFIG
 from python_code.utils.metrics import count_parameters
 
-BATCH_SIZE = 128
+BATCH_SIZE = 32
 
 
 class HypernetworkTrainer(Trainer):
@@ -20,7 +20,7 @@ class HypernetworkTrainer(Trainer):
     def __init__(self):
         super().__init__()
         self.lr = 5e-4
-        self.epochs = 25
+        self.epochs = 30
         self.train_context_embedding = []
         self.test_context_embedding = []
 
@@ -70,11 +70,14 @@ class HypernetworkTrainer(Trainer):
         total_parameters = chain(total_parameters, self.this_user_vec.parameters())
         total_parameters = chain(total_parameters, self.no_user_vec.parameters())
         self.optimizer = torch.optim.Adam(total_parameters, lr=self.lr)
+        all_users_indices = np.arange(0, TRAINING_BLOCKS_PER_CONFIG * (MAX_USERS - 1), TRAINING_BLOCKS_PER_CONFIG)
         for epoch in range(self.epochs):
             print(f'Epoch {epoch + 1}/{self.epochs}')
-            curr_batch = np.random.choice(len(H_hat), BATCH_SIZE)
+            curr_batch = np.random.choice(TRAINING_BLOCKS_PER_CONFIG, BATCH_SIZE).reshape(-1,1) + all_users_indices.reshape(1,-1)
+            curr_batch = curr_batch.reshape(-1)
             total_loss = 0
             for i in curr_batch:
+                loss = 0
                 n_users = H_hat[i].shape[0]
                 for user in range(n_users):
                     mx, rx = message_words[i], received_words[i]
@@ -92,12 +95,12 @@ class HypernetworkTrainer(Trainer):
                     hyper_input = torch.cat([hyper_input, padding], dim=1)
                     soft_estimation = self.hyper_deepsic(hyper_input, weights)
                     # calculate loss
-                    loss = self._calc_loss(est=soft_estimation, mx=mx[:, user])
-                    # back propagation
-                    self.optimizer.zero_grad()
-                    loss.backward()
-                    self.optimizer.step()
-                    total_loss += loss / n_users
+                    loss += self._calc_loss(est=soft_estimation, mx=mx[:, user])
+                # back propagation
+                self.optimizer.zero_grad()
+                loss.backward()
+                self.optimizer.step()
+                total_loss += loss / n_users
             avg_loss = (total_loss / len(curr_batch)).item()
             print(f"Loss: {avg_loss}")
 
