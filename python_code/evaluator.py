@@ -13,6 +13,7 @@ from python_code.utils.channel_estimate import ls_channel_estimation
 from python_code.utils.constants import Phase, MAX_USERS, TRAINING_BLOCKS_PER_CONFIG, \
     ChannelType, DetectorUtil, DetectorType
 from python_code.utils.metrics import calculate_error_rate
+import time
 
 random.seed(conf.seed)
 torch.manual_seed(conf.seed)
@@ -107,4 +108,8 @@ class Evaluator(object):
 
 if __name__ == "__main__":
     evaluator = Evaluator()
+    start = time.time()
     evaluator.evaluate()
+    end = time.time()
+    print(f"Runtime:{end - start}")
+
