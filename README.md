@@ -63,46 +63,24 @@ Features main plotting tools for the paper:
 
 ### utils
 
-Extra utils for pickle manipulations and tensor reshaping; calculating the accuracy over FER and BER; several constants; and the config singleton class.
-The config works by the [singleton design pattern](https://en.wikipedia.org/wiki/Singleton_pattern). Check the link if unfamiliar. 
+Extra utils for pickle manipulations, metric calculations, channel estimation and constants holding.
+The config in config_singleton.py is used throughout the repo, and follows the [singleton design pattern](https://en.wikipedia.org/wiki/Singleton_pattern). Check the link if unfamiliar. 
 
-The config is accessible from every module in the package, featuring the next parameters:
+The config.yaml is accessible from every module in the package, featuring the next parameters which should be changed before running eval/plotting:
 1. seed - random number generator seed. Integer.
-2. channel_type - run either siso or mimo setup. Values in the set of ['SISO','MIMO']. String.
-3. channel_model - chooses the channel taps values, either synthetic or based on COST2100. String in the set ['Cost2100','Synthetic'].
-4. detector_type - selects the training + architecture to run. Short description of each option: 
-* 'joint_black_box - Joint training of the black-box fully connected detector in the MIMO case.
-* 'online_black_box' - Online training of the black-box fully connected detector in the MIMO case.
-* 'joint_deepsic' - Joint training of the DeepSIC detector in the MIMO case.
-* 'online_deepsic' - Online training of the DeepSIC detector in the MIMO case.
-* 'meta_deepsic' - Online meta-training of the DeepSIC detector in the MIMO case.
-* 'joint_rnn' - Joint training of the RNN detector in the SISO case.
-* 'online_rnn' - online training of the RNN detector in the SISO case.
-* 'joint_viterbinet' - Joint training of the ViterbiNet equalizer in the SISO case.
-* 'online_viterbinet' - Online training of the ViterbiNet equalizer in the SISO case.
-* 'meta_viterbinet' - Online meta-training of the ViterbiNet equalizer in the SISO case.
-5. linear - whether to apply non-linear tanh at the channel output, not used in the paper but still may be applied. Bool.
-6.fading_in_channel - whether to use fading. Relevant only to the synthetic channel. Boolean flag.
-7. snr - signal-to-noise ratio, determines the variance properties of the noise, in dB. Float.
-8. modulation_type - either 'BPSK' or 'QPSK', string.
-9. memory_length - siso channel hyperparameter, integer.
-10. n_user - mimo channel hyperparameter, number of transmitting devices. Integer.
-11. n_ant - mimo channel hyperparameter, number of receiving devices. Integer.
-12. block_length - number of coherence block bits, total size of pilot + data. Integer.
-13. pilot_size - number of pilot bits. Integer.
-14. blocks_num - number of blocks in the tranmission. Integer.
-15. loss_type - 'CrossEntropy', could be altered to other types 'BCE' or 'MSE'.
-16. optimizer_type - 'Adam', could be altered to other types 'RMSprop' or 'SGD'.
-17. joint_block_length - joint training hyperparameter. Offline training block length. Integer.
-18. joint_pilot_size - joint training hyperparameter. Offline training pilots block length. Integer.
-19. joint_blocks_num - joint training hyperparameter. Number of blocks to train on offline. Integer.
-20. joint_snrs - joint training hyperparameter. Number of SNRs to traing from offline. List of float values.
-21. aug_type - what augmentations to use. leave empty list for no augmentations, or add whichever of the following you like: ['geometric_augmenter','translation_augmenter','rotation_augmenter']
-22. online_repeats_n - if using augmentations, adds this factor times the number of pilots to the training batch. Leave at 0 if not using augmentations, if using augmentations try integer values in 2-5.
+2. n_ant - integer, the number of antennas in the base station.
+3. channel_type - Values in the set of ['SED','COST']. String.
+4. cost_snr - float value for setting the snr in the cost channel only.
+5. detector_type - selects the training + architecture to run. Values in ['online_deepsic','joint_deepsic','hyper_deepsic'].
+6. train_test_mismatch - bool. If True, then if evaluating on channel_type of 'SED' training will be done on 'COST' and vice versa.
+7. train_block_length - size of training block for joint training of either hypernetwork or joint deepsic. Integer.
+8. test_block_length - size of total block for testing, composed of pilots + information part. Integer.
+9. test_pilots_length - number of pilots, integer. The information size is set to test_block_length - test_pilots_length.
+10. test_blocks_num - number of validation blocks, denoted as T in the paper. Integer.
 
 ## resources
 
-Keeps the COST channel coefficients vectors. Also holds config runs for the paper's numerical comparisons figures.
+Keeps the COST channel coefficients vectors.
 
 ## dir_definitions 
 
