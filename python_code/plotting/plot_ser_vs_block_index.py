@@ -14,6 +14,7 @@ if __name__ == "__main__":
         {'detector_type': 'joint_deepsic'},
         {'detector_type': 'online_deepsic'},
         {'detector_type': 'hyper_deepsic'},
+        {'detector_type': 'icl_detector'}
     ]
     seeds = range(1, 2)
 
