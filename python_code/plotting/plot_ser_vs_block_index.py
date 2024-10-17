@@ -12,7 +12,6 @@ from python_code.plotting import *
 if __name__ == "__main__":
     params_list = [
         {'detector_type': 'joint_deepsic'},
-        # {'detector_type': 'online_deepsic'},
         {'detector_type': 'hyper_deepsic'},
         {'detector_type': 'icl_detector'}
     ]
@@ -44,9 +43,9 @@ if __name__ == "__main__":
     plt.xlabel('Block Index')
     plt.ylabel('SER')
     plt.grid(which='both', ls='--')
-    leg = plt.legend(loc='lower right', prop={'size': 20}, handlelength=4)
+    leg = plt.legend(loc='upper left', prop={'size': 20}, handlelength=4)
     plt.yscale('log')
-    plt.ylim(bottom=1e-4)
+    plt.ylim(bottom=5e-5)
     plt.savefig(os.path.join(FIGURES_DIR, folder_name, f'ser_{conf.n_ant}.png'),
                 bbox_inches='tight')
     plt.show()

@@ -1,3 +1,5 @@
+from typing import List
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -7,7 +9,8 @@ from transformers import GPT2Model, GPT2Config
 
 from python_code import DEVICE
 from python_code import conf
-from python_code.utils.constants import DetectorUtil
+from python_code.datasets.communications_blocks.users_network import N_USER
+from python_code.utils.constants import DetectorUtil, MAX_USERS
 
 
 def build_model(embedding_dim, n_positions, num_heads, num_layers, data_dim):
@@ -158,7 +161,6 @@ class ICLDetector(nn.Module):
                 for j in range(n_seq):
                     seq_start = j * self.prompt_seq_length
                     seq_end = min((j + 1) * self.prompt_seq_length, sequence_length)
-
                     if seq_start >= seq_end:
                         continue  # Skip invalid ranges
                     # Extracting the sub-sequences for the batch
@@ -170,27 +172,37 @@ class ICLDetector(nn.Module):
                     x_total[batch_id, seq_start:seq_end, :] = output
         return x_total.reshape([-1, detector_util.n_users])
 
-    def train(self, x_tr: torch.Tensor, y_tr: torch.Tensor, detector_util: DetectorUtil = None, validation_split=0.2):
+    def train(self, mxs: torch.Tensor, rxs: torch.Tensor, detector_util: DetectorUtil = None):
+        users_indices = [(mx.shape[1], i) for i, mx in enumerate(mxs)]
+        for n_user in range(MAX_USERS, 1, -1):
+            relevant_ind_pairs = list(filter(lambda x: x[0] == n_user, users_indices))
+            if len(relevant_ind_pairs) == 0:
+                continue
+            if n_user != N_USER:
+                continue
+            print(f"Training model for {n_user} users")
+            x_tr = [mxs[ind] for n_user, ind in relevant_ind_pairs]
+            y_tr = torch.stack([rxs[ind] for n_user, ind in relevant_ind_pairs])
+            self.train_for_users_config(x_tr, y_tr)
+
+    def train_for_users_config(self, x_tr: List[torch.Tensor], y_tr: List[torch.Tensor]):
         x_tr = torch.stack(x_tr)
         total_batches = x_tr.shape[0]
+        validation_split = 0.1
         val_batches = int(total_batches * validation_split)
         train_batches = total_batches - val_batches
 
         # Split data into training and validation
-        x_val, y_val = x_tr[-val_batches:], y_tr[-val_batches:]  # Validation set (20% of batches)
-        x_tr, y_tr = x_tr[:train_batches], y_tr[:train_batches]  # Training set (80% of batches)
-        total_batches = x_tr.shape[0]
+        x_val, y_val = x_tr[-val_batches:], y_tr[-val_batches:]  # Validation set
+        x_tr, y_tr = x_tr[:train_batches], y_tr[:train_batches]  # Training set
         sequence_length = x_tr.shape[1]
         loss_function = nn.MSELoss(reduction='mean')
         optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
-
         n_it_per_epoch = train_batches // self.batch_size + 1
         early_stopping = EarlyStopping(patience=5)  # Set patience for early stopping
         VALIDATION_EPOCHS = 25
-
         for epoch in range(self.epochs):
             running_loss = 0
-
             # Training loop
             for i in range(n_it_per_epoch):
                 # Select random sequence indices for this batch along the second dimension
@@ -198,7 +210,7 @@ class ICLDetector(nn.Module):
                     np.random.choice(sequence_length, self.prompt_seq_length, replace=False)).long()
 
                 # Get the batch of data (first dim: batch size, second dim: sequence length)
-                batch_id = torch.arange(i * self.batch_size, min((i + 1) * self.batch_size, total_batches)).long()
+                batch_id = torch.arange(i * self.batch_size, min((i + 1) * self.batch_size, train_batches)).long()
 
                 # Select the random sequences for both x_tr and y_tr
                 xs_batch = x_tr[batch_id, :, :]
@@ -206,6 +218,7 @@ class ICLDetector(nn.Module):
                 ys_batch = y_tr[batch_id, :, :]
                 ys_batch = ys_batch[:, random_seq_indices, :]
 
+                # compute loss and outputs
                 loss, output = train_step(self.model, ys_batch=ys_batch, xs_batch=xs_batch, xs_real=xs_batch,
                                           optimizer=optimizer, loss_func=loss_function)
                 running_loss += loss / n_it_per_epoch

@@ -52,7 +52,7 @@ class Evaluator(object):
                 return
             # if they don't exist run joint training (and save the weights for next run)
             train_channel_dataset = ChannelModelDataset(block_length=conf.train_block_length,
-                                                        blocks_num=TRAINING_BLOCKS_PER_CONFIG,
+                                                        blocks_num=TRAINING_BLOCKS_PER_CONFIG * (MAX_USERS-1),
                                                         pilots_length=1, phase=Phase.TRAIN)
             message_words, received_words = train_channel_dataset.__getitem__()
             detector_util = DetectorUtil(H_hat=[ls_channel_estimation(mx_pilots, rx_pilots) for mx_pilots, rx_pilots in
