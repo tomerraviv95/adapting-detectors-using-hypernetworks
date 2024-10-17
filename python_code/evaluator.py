@@ -1,5 +1,6 @@
 import os
 import random
+import time
 from collections import namedtuple
 
 import numpy as np
@@ -13,7 +14,6 @@ from python_code.utils.channel_estimate import ls_channel_estimation
 from python_code.utils.constants import Phase, MAX_USERS, TRAINING_BLOCKS_PER_CONFIG, \
     ChannelType, DetectorUtil, DetectorType
 from python_code.utils.metrics import calculate_error_rate
-import time
 
 random.seed(conf.seed)
 torch.manual_seed(conf.seed)
@@ -39,7 +39,8 @@ class Evaluator(object):
                                                         pilots_length=conf.test_pilots_length,
                                                         phase=Phase.TEST)
         # if training is offline, either load the weights or train the detector for this config
-        if conf.detector_type in [DetectorType.joint_deepsic.name, DetectorType.hyper_deepsic.name]:
+        if conf.detector_type in [DetectorType.joint_deepsic.name, DetectorType.hyper_deepsic.name,
+                                  DetectorType.icl_detector.name]:
             if not os.path.isdir(WEIGHTS_DIR):
                 os.makedirs(WEIGHTS_DIR)
             run_path = self.get_run_path()
@@ -51,7 +52,7 @@ class Evaluator(object):
                 return
             # if they don't exist run joint training (and save the weights for next run)
             train_channel_dataset = ChannelModelDataset(block_length=conf.train_block_length,
-                                                        blocks_num=TRAINING_BLOCKS_PER_CONFIG * (MAX_USERS - 1),
+                                                        blocks_num=TRAINING_BLOCKS_PER_CONFIG,
                                                         pilots_length=1, phase=Phase.TRAIN)
             message_words, received_words = train_channel_dataset.__getitem__()
             detector_util = DetectorUtil(H_hat=[ls_channel_estimation(mx_pilots, rx_pilots) for mx_pilots, rx_pilots in
@@ -112,4 +113,3 @@ if __name__ == "__main__":
     evaluator.evaluate()
     end = time.time()
     print(f"Runtime:{end - start}")
-

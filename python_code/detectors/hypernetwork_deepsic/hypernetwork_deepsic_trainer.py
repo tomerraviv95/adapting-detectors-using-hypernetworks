@@ -70,7 +70,7 @@ class HypernetworkTrainer(Trainer):
         total_parameters = chain(total_parameters, self.this_user_vec.parameters())
         total_parameters = chain(total_parameters, self.no_user_vec.parameters())
         self.optimizer = torch.optim.Adam(total_parameters, lr=self.lr)
-        all_users_indices = np.arange(0, TRAINING_BLOCKS_PER_CONFIG * (MAX_USERS - 1), TRAINING_BLOCKS_PER_CONFIG)
+        all_users_indices = np.arange(0, len(message_words) // TRAINING_BLOCKS_PER_CONFIG, TRAINING_BLOCKS_PER_CONFIG)
         for epoch in range(self.epochs):
             print(f'Epoch {epoch + 1}/{self.epochs}')
             curr_batch = np.random.choice(TRAINING_BLOCKS_PER_CONFIG, BATCH_SIZE).reshape(-1,1) + all_users_indices.reshape(1,-1)
