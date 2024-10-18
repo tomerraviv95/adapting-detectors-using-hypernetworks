@@ -41,7 +41,7 @@ class OnlineDeepSICTrainer(Trainer):
         for user in range(n_user):
             self.train_model(model[user], mx_all[user], rx_all[user])
 
-    def train(self, mx: torch.Tensor, rx: torch.Tensor, detector_util: DetectorUtil = None):
+    def online_train(self, mx: torch.Tensor, rx: torch.Tensor, detector_util: DetectorUtil = None):
         """
         Main training function for DeepSIC evaluater. Initializes the probabilities, then propagates them through
         the network, training sequentially each network and not by end-to-end manner (each one individually).

@@ -185,7 +185,11 @@ class ICLDetector(nn.Module):
             y_tr = torch.stack([rxs[ind] for n_user, ind in relevant_ind_pairs])
             self.train_for_users_config(x_tr, y_tr)
 
-    def train_for_users_config(self, x_tr: List[torch.Tensor], y_tr: List[torch.Tensor]):
+    def online_train(self, mxs: torch.Tensor, rxs: torch.Tensor, detector_util: DetectorUtil = None):
+        self.train_for_users_config([mx for mx in mxs.reshape(-1, self.prompt_seq_length, mxs.shape[1])],
+                                    rxs.reshape(-1, self.prompt_seq_length, rxs.shape[1]))
+
+    def train_for_users_config(self, x_tr: List[torch.Tensor], y_tr: torch.Tensor):
         x_tr = torch.stack(x_tr)
         total_batches = x_tr.shape[0]
         validation_split = 0.1

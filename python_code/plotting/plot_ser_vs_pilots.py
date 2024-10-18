@@ -11,9 +11,10 @@ from python_code.plotting import *
 
 if __name__ == "__main__":
     params_list = [
-        {'detector_type': 'joint_deepsic'},
-        {'detector_type': 'online_deepsic'},
-        {'detector_type': 'hyper_deepsic'},
+        # {'detector_type': 'joint_deepsic'},
+        # {'detector_type': 'online_deepsic'},
+        # {'detector_type': 'hyper_deepsic'},
+        {'detector_type': 'icl_detector'},
     ]
     pilot_sizes = [200, 400, 600, 800, 1000]
     seeds = range(2, 3)

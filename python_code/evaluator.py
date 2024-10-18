@@ -92,9 +92,9 @@ class Evaluator(object):
             mx_data, rx_data = mx[conf.test_pilots_length:], rx[conf.test_pilots_length:]
             # ---------------------------------------------------------
             # Online training
-            if conf.detector_type == DetectorType.online_deepsic.name:
+            if conf.detector_type in [DetectorType.online_deepsic.name,DetectorType.icl_detector.name]:
                 # run online training on the pilots part
-                self.detector.train(mx_pilot, rx_pilot)
+                self.detector.online_train(mx_pilot, rx_pilot)
             detector_util = DetectorUtil(H_hat=ls_channel_estimation(mx_pilot, rx_pilot), n_users=mx_pilot.shape[1])
             # ---------------------------------------------------------
             # detect data part after training on the pilot part
