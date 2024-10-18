@@ -11,13 +11,13 @@ from python_code.plotting import *
 
 if __name__ == "__main__":
     params_list = [
-        # {'detector_type': 'joint_deepsic'},
-        # {'detector_type': 'online_deepsic'},
-        # {'detector_type': 'hyper_deepsic'},
+        {'detector_type': 'joint_deepsic'},
+        {'detector_type': 'online_deepsic'},
+        {'detector_type': 'hyper_deepsic'},
         {'detector_type': 'icl_detector'},
     ]
-    pilot_sizes = [200, 400, 600, 800, 1000]
-    seeds = range(2, 3)
+    pilot_sizes = [100, 200, 300, 400, 500]
+    seeds = range(1, 2)
 
     # path for the saved figure
     current_day_time = datetime.now()
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     plt.xlabel('Pilots Number')
     plt.ylabel('SER')
     plt.grid(which='both', ls='--')
-    leg = plt.legend(loc='lower left', prop={'size': 20}, handlelength=4)
+    leg = plt.legend(loc='upper right', prop={'size': 20}, handlelength=4)
     plt.yscale('log')
     plt.savefig(os.path.join(FIGURES_DIR, folder_name, f'ser_vs_pilots_number_{conf.n_ant}.png'),
                 bbox_inches='tight')

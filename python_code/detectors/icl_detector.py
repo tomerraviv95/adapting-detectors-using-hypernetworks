@@ -149,27 +149,27 @@ class ICLDetector(nn.Module):
         return 'ICL Detector'
 
     def forward(self, rx: torch.Tensor, detector_util: DetectorUtil) -> torch.Tensor:
-        reshaped_rx = rx.reshape([-1, self.prompt_seq_length, self.data_dim])
+        context_mxs, context_rxs = self.context
+        reshaped_context_rxs = context_rxs.reshape([-1, self.prompt_seq_length // 2, self.data_dim])
+        reshaped_context_mxs = context_mxs.reshape([-1, self.prompt_seq_length // 2, detector_util.n_users])
+        context_batches = reshaped_context_rxs.shape[0]
+        reshaped_rx = rx.reshape([-1, self.prompt_seq_length // 2, self.data_dim])
         total_batches = reshaped_rx.shape[0]
-        sequence_length = reshaped_rx.shape[1]
         n_it = total_batches // self.batch_size + 1
-        n_seq = sequence_length // self.prompt_seq_length + 1
         x_total = torch.zeros([reshaped_rx.shape[0], reshaped_rx.shape[1], detector_util.n_users]).int().to(DEVICE)
         with torch.no_grad():
             for i in range(n_it):
-                batch_id = torch.arange(i * self.batch_size, min((i + 1) * self.batch_size, total_batches)).long()
-                for j in range(n_seq):
-                    seq_start = j * self.prompt_seq_length
-                    seq_end = min((j + 1) * self.prompt_seq_length, sequence_length)
-                    if seq_start >= seq_end:
-                        continue  # Skip invalid ranges
-                    # Extracting the sub-sequences for the batch
-                    ys_batch = reshaped_rx[batch_id, seq_start:seq_end, :]
-                    xs_batch = x_total[batch_id, seq_start:seq_end, :]
-                    # Predict step (using > 0.5 threshold for binary decision)
-                    output = (predict_step(self.model, ys_batch, xs_batch) > 0.5).int()
-                    # Assign the output back into x_total for the respective batch and sequence
-                    x_total[batch_id, seq_start:seq_end, :] = output
+                current_batch_start = i * self.batch_size
+                current_batch_end = min((i + 1) * self.batch_size, total_batches)
+                batch_id = torch.arange(current_batch_start, current_batch_end).long()
+                context_batch_id = torch.tensor(
+                    np.random.choice(context_batches, current_batch_end - current_batch_start, replace=True)).long()
+                ys_batch = torch.cat([reshaped_context_rxs[context_batch_id], reshaped_rx[batch_id]], dim=1)
+                xs_batch = torch.cat([reshaped_context_mxs[context_batch_id], x_total[batch_id]], dim=1)
+                # Predict step (using > 0.5 threshold for binary decision)
+                output = (predict_step(self.model, ys_batch, xs_batch) > 0.5).int()
+                # Assign the output back into x_total for the respective batch and sequence
+                x_total[batch_id] = output[:, self.prompt_seq_length // 2:]
         return x_total.reshape([-1, detector_util.n_users])
 
     def train(self, mxs: torch.Tensor, rxs: torch.Tensor, detector_util: DetectorUtil = None):
@@ -186,8 +186,7 @@ class ICLDetector(nn.Module):
             self.train_for_users_config(x_tr, y_tr)
 
     def online_train(self, mxs: torch.Tensor, rxs: torch.Tensor, detector_util: DetectorUtil = None):
-        self.train_for_users_config([mx for mx in mxs.reshape(-1, self.prompt_seq_length, mxs.shape[1])],
-                                    rxs.reshape(-1, self.prompt_seq_length, rxs.shape[1]))
+        self.context = (mxs, rxs)
 
     def train_for_users_config(self, x_tr: List[torch.Tensor], y_tr: torch.Tensor):
         x_tr = torch.stack(x_tr)
