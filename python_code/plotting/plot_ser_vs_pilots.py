@@ -16,8 +16,9 @@ if __name__ == "__main__":
         {'detector_type': 'hyper_deepsic'},
         {'detector_type': 'icl_detector'},
     ]
-    pilot_sizes = [100, 200, 300, 400, 500]
-    seeds = range(1, 2)
+
+    pilot_sizes = [100, 200, 300, 400]
+    seeds = range(2, 3)
 
     # path for the saved figure
     current_day_time = datetime.now()
@@ -38,12 +39,17 @@ if __name__ == "__main__":
             method_name = evaluator.detector.__str__()
             for pilot_size in pilot_sizes:
                 conf.set_value('test_pilots_length', pilot_size)
+                conf.set_value('test_block_length', 15000 + pilot_size)
+                if conf.detector_type == 'icl_detector':
+                    conf.set_value('prompt_seq_length', pilot_size)
+                    evaluator = Evaluator()
                 metrics_output: MetricOutput = evaluator.evaluate()
                 cur_ser = np.mean(np.array(metrics_output.ser_list))
                 cur_ser_values.append(cur_ser)
             ser_values.append(cur_ser_values)
         ser_values = np.sum(np.array(ser_values), axis=0) / len(seeds)
-        plt.plot(pilot_sizes, ser_values, label=method_name, color=COLORS_DICT[method_name],
+        plt.plot(pilot_sizes, ser_values, label=method_name,
+                 color=COLORS_DICT[method_name],
                  marker=MARKERS_DICT[method_name], markersize=11,
                  linestyle=LINESTYLES_DICT[method_name], linewidth=2.2)
     plt.xlabel('Pilots Number')

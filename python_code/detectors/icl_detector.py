@@ -133,7 +133,7 @@ class ICLDetector(nn.Module):
         self.num_head = 4
         self.num_layer = 2
         self.dropout = 0
-        self.prompt_seq_length = 20
+        self.prompt_seq_length = conf.prompt_seq_length
         self.data_dim = conf.n_ant
         self.learning_rate = 1e-4
         self.batch_size = 128
