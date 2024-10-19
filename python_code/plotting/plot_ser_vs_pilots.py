@@ -3,7 +3,7 @@ from datetime import datetime
 
 import numpy as np
 from matplotlib import pyplot as plt
-
+import pickle
 from dir_definitions import FIGURES_DIR
 from python_code import conf
 from python_code.evaluator import Evaluator, MetricOutput
@@ -52,6 +52,9 @@ if __name__ == "__main__":
                  color=COLORS_DICT[method_name],
                  marker=MARKERS_DICT[method_name], markersize=11,
                  linestyle=LINESTYLES_DICT[method_name], linewidth=2.2)
+        # Save to a .pkl file
+        with open(f'{method_name}.pkl', 'wb') as file:
+            pickle.dump(ser_values, file)
     plt.xlabel('Pilots Number')
     plt.ylabel('SER')
     plt.grid(which='both', ls='--')
