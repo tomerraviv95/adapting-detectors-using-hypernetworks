@@ -11,8 +11,7 @@ from python_code import conf
 from python_code.datasets.channel_dataset import ChannelModelDataset
 from python_code.detectors import DETECTORS_TYPE_DICT
 from python_code.utils.channel_estimate import ls_channel_estimation
-from python_code.utils.constants import Phase, MAX_USERS, TRAINING_BLOCKS_PER_CONFIG, \
-    ChannelType, DetectorUtil, DetectorType
+from python_code.utils.constants import Phase, MAX_USERS, ChannelType, DetectorUtil, DetectorType
 from python_code.utils.metrics import calculate_error_rate
 
 random.seed(conf.seed)
@@ -52,7 +51,7 @@ class Evaluator(object):
                 return
             # if they don't exist run joint training (and save the weights for next run)
             train_channel_dataset = ChannelModelDataset(block_length=conf.train_block_length,
-                                                        blocks_num=TRAINING_BLOCKS_PER_CONFIG * (MAX_USERS-1),
+                                                        blocks_num=conf.tasks_number * (MAX_USERS - 1),
                                                         pilots_length=1, phase=Phase.TRAIN)
             message_words, received_words = train_channel_dataset.__getitem__()
             detector_util = DetectorUtil(H_hat=[ls_channel_estimation(mx_pilots, rx_pilots) for mx_pilots, rx_pilots in
@@ -94,7 +93,7 @@ class Evaluator(object):
             mx_data, rx_data = mx[conf.test_pilots_length:], rx[conf.test_pilots_length:]
             # ---------------------------------------------------------
             # Online training
-            if conf.detector_type in [DetectorType.online_deepsic.name,DetectorType.icl_detector.name]:
+            if conf.detector_type in [DetectorType.online_deepsic.name, DetectorType.icl_detector.name]:
                 # run online training on the pilots part
                 self.detector.online_train(mx_pilot, rx_pilot)
             detector_util = DetectorUtil(H_hat=ls_channel_estimation(mx_pilot, rx_pilot), n_users=mx_pilot.shape[1])

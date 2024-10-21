@@ -1,10 +1,11 @@
-from python_code.utils.constants import Phase, TRAINING_BLOCKS_PER_CONFIG, MAX_USERS
+from python_code import conf
+from python_code.utils.constants import Phase, MAX_USERS
 
 N_USER = 14
 NUMBER_OF_USERS_DICT_TRAIN = {(i, j): user for i, j, user in
-                              zip(range(0, TRAINING_BLOCKS_PER_CONFIG * MAX_USERS, TRAINING_BLOCKS_PER_CONFIG),
-                                  range(TRAINING_BLOCKS_PER_CONFIG, TRAINING_BLOCKS_PER_CONFIG * (MAX_USERS + 1),
-                                        TRAINING_BLOCKS_PER_CONFIG),
+                              zip(range(0, conf.tasks_number * MAX_USERS, conf.tasks_number),
+                                  range(conf.tasks_number, conf.tasks_number * (MAX_USERS + 1),
+                                        conf.tasks_number),
                                   range(2, MAX_USERS + 1))}
 
 # Dict that describes the number of users in a sequence of blocks.

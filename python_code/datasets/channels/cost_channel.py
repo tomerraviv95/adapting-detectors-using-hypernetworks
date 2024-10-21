@@ -5,7 +5,7 @@ import scipy.io
 
 from dir_definitions import COST2100_TRAIN_DIR, COST2100_TEST_DIR
 from python_code.utils.config_singleton import Config
-from python_code.utils.constants import Phase, TRAINING_BLOCKS_PER_CONFIG
+from python_code.utils.constants import Phase
 
 conf = Config()
 
@@ -27,7 +27,7 @@ class COSTChannel:
         for i in range(1, n_ant + 1):
             if phase == Phase.TRAIN:
                 # train using 20 different channels
-                channel = 1 + index // TRAINING_BLOCKS_PER_CONFIG
+                channel = 1 + index // conf.tasks_number
                 path_to_ant_mat = os.path.join(COST2100_TRAIN_DIR, f'channel_{channel}_ant_{i}.mat')
             else:
                 # test on channel 0
@@ -36,7 +36,7 @@ class COSTChannel:
             # assume max and min threshold for the analog power reception
             norm_h_user = (total_h_user - MIN_POWER) / (MAX_POWER - MIN_POWER)
             # only take the channel coefs up to the current online users
-            cur_h_user = norm_h_user[:n_user, index % TRAINING_BLOCKS_PER_CONFIG]
+            cur_h_user = norm_h_user[:n_user, index % conf.tasks_number]
             total_h[:, i - 1] = SCALING_COEF * cur_h_user  # reduce side-lobes via beamforming
         # beamforming (beam focusing) for each user
         total_h[np.arange(n_user), np.arange(n_user)] = 1

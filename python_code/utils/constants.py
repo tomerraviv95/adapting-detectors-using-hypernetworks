@@ -25,5 +25,4 @@ DetectorUtil = namedtuple("DetectorUtil", "H_hat n_users", defaults=[None, None]
 
 HIDDEN_SIZE = 16
 MAX_USERS = conf.n_ant
-TRAINING_BLOCKS_PER_CONFIG = 100  # Number of training blocks per user number. Only used in offline training.
 HALF = 0.5

@@ -4,12 +4,12 @@ import numpy as np
 import torch
 from torch.nn import Embedding
 
-from python_code import DEVICE
+from python_code import DEVICE, conf
 from python_code.detectors.deepsic.deepsic_detector import DeepSICDetector
 from python_code.detectors.hypernetwork_deepsic.hyper_deepsic import HyperDeepSICDetector
 from python_code.detectors.hypernetwork_deepsic.hypernetwork import Hypernetwork
 from python_code.detectors.trainer import Trainer
-from python_code.utils.constants import MAX_USERS, HIDDEN_SIZE, DetectorUtil, TRAINING_BLOCKS_PER_CONFIG
+from python_code.utils.constants import MAX_USERS, HIDDEN_SIZE, DetectorUtil
 from python_code.utils.metrics import count_parameters
 
 BATCH_SIZE = 32
@@ -70,12 +70,12 @@ class HypernetworkTrainer(Trainer):
         total_parameters = chain(total_parameters, self.this_user_vec.parameters())
         total_parameters = chain(total_parameters, self.no_user_vec.parameters())
         self.optimizer = torch.optim.Adam(total_parameters, lr=self.lr)
-        all_users_indices = TRAINING_BLOCKS_PER_CONFIG * np.arange(0, len(message_words) // TRAINING_BLOCKS_PER_CONFIG)
+        all_users_indices = conf.tasks_number * np.arange(0, len(message_words) // conf.tasks_number)
         for epoch in range(self.epochs):
             print(f'Epoch {epoch + 1}/{self.epochs}')
             # to make sure that we sample over all possible user values
             # and minimize their losses simultaneously - this is the heart of the method!
-            curr_batch = np.random.choice(TRAINING_BLOCKS_PER_CONFIG, BATCH_SIZE).reshape(-1, 1) + all_users_indices.reshape(1,-1)
+            curr_batch = np.random.choice(conf.tasks_number, BATCH_SIZE).reshape(-1, 1) + all_users_indices.reshape(1,-1)
             curr_batch = curr_batch.reshape(-1)
             total_loss = 0
             for i in curr_batch:
