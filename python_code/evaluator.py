@@ -69,6 +69,7 @@ class Evaluator(object):
             run_name += ChannelType.COST.name + "_" + str(conf.cost_snr)
         if conf.detector_type == DetectorType.icl_detector.name:
             run_name += f'_prompt_len_{conf.prompt_seq_length}'
+        run_name += f'_tasks_{conf.tasks_number}'
         run_name += '.pt'
         return run_name
 

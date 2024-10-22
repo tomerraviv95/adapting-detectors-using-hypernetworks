@@ -22,7 +22,7 @@ class ChannelModelDataset(Dataset):
     def __init__(self, block_length: int, blocks_num: int, pilots_length: int, phase: Phase):
         self.block_length = block_length
         self.blocks_num = blocks_num
-        self.users_network = UsersNetwork(phase)
+        self.users_network = UsersNetwork(phase,self.blocks_num)
         self.generator = Generator(block_length, pilots_length)
         self.modulator = BPSKModulator()
         self.transmitter = Transmitter(phase)

@@ -36,7 +36,7 @@ class COSTChannel:
             # assume max and min threshold for the analog power reception
             norm_h_user = (total_h_user - MIN_POWER) / (MAX_POWER - MIN_POWER)
             # only take the channel coefs up to the current online users
-            cur_h_user = norm_h_user[:n_user, index % conf.tasks_number]
+            cur_h_user = norm_h_user[:n_user, index % norm_h_user.shape[1]]
             total_h[:, i - 1] = SCALING_COEF * cur_h_user  # reduce side-lobes via beamforming
         # beamforming (beam focusing) for each user
         total_h[np.arange(n_user), np.arange(n_user)] = 1

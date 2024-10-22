@@ -210,7 +210,8 @@ class ICLDetector(nn.Module):
             for i in range(n_it_per_epoch):
                 # Select random sequence indices for this batch along the second dimension
                 random_seq_indices = torch.tensor(
-                    np.random.choice(sequence_length, self.prompt_seq_length, replace=False)).long()
+                    np.random.choice(sequence_length, min(self.prompt_seq_length, sequence_length),
+                                     replace=False)).long()
 
                 # Get the batch of data (first dim: batch size, second dim: sequence length)
                 batch_id = torch.arange(i * self.batch_size, min((i + 1) * self.batch_size, train_batches)).long()
@@ -246,7 +247,8 @@ class ICLDetector(nn.Module):
             for i in range(int(total_batches)):
                 # Select random sequence indices for this batch along the second dimension
                 random_seq_indices = torch.tensor(
-                    np.random.choice(sequence_length, self.prompt_seq_length, replace=False)).long()
+                    np.random.choice(sequence_length, min(self.prompt_seq_length, sequence_length),
+                                     replace=False)).long()
 
                 # Get the batch of data (first dim: batch size, second dim: sequence length)
                 start_ind = i * self.batch_size

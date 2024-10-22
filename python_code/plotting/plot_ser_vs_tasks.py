@@ -15,8 +15,7 @@ if __name__ == "__main__":
         {'detector_type': 'hyper_deepsic'},
         {'detector_type': 'icl_detector'},
     ]
-
-    tasks_number_list = [20, 40, 60, 80, 100]
+    tasks_number_list = [100]
     seeds = range(2, 3)
 
     # path for the saved figure
@@ -34,14 +33,13 @@ if __name__ == "__main__":
         for seed in seeds:
             conf.set_value('seed', seed)
             cur_ser_values = []
-            evaluator = Evaluator()
-            method_name = evaluator.detector.__str__()
             for tasks_number in tasks_number_list:
                 conf.set_value('tasks_number', tasks_number)
                 evaluator = Evaluator()
                 metrics_output: MetricOutput = evaluator.evaluate()
                 cur_ser = np.mean(np.array(metrics_output.ser_list))
                 cur_ser_values.append(cur_ser)
+            method_name = evaluator.detector.__str__()
             ser_values.append(cur_ser_values)
         ser_values = np.sum(np.array(ser_values), axis=0) / len(seeds)
         plt.plot(tasks_number_list, ser_values, label=method_name,
@@ -51,11 +49,11 @@ if __name__ == "__main__":
         # Save to a .pkl file
         with open(f'{method_name}_tasks_number.pkl', 'wb') as file:
             pickle.dump(ser_values, file)
-    plt.xlabel('Pilots Number')
+    plt.xlabel('Tasks Number')
     plt.ylabel('SER')
     plt.grid(which='both', ls='--')
     leg = plt.legend(loc='upper right', prop={'size': 20}, handlelength=4)
     plt.yscale('log')
-    plt.savefig(os.path.join(FIGURES_DIR, folder_name, f'ser_vs_pilots_number_{conf.n_ant}.png'),
+    plt.savefig(os.path.join(FIGURES_DIR, folder_name, f'ser_vs_tasks_number_{conf.n_ant}.png'),
                 bbox_inches='tight')
     plt.show()
