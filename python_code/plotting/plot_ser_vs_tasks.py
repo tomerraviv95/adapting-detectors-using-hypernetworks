@@ -1,9 +1,10 @@
 import os
+import pickle
 from datetime import datetime
 
 import numpy as np
 from matplotlib import pyplot as plt
-import pickle
+
 from dir_definitions import FIGURES_DIR
 from python_code import conf
 from python_code.evaluator import Evaluator, MetricOutput
@@ -15,7 +16,7 @@ if __name__ == "__main__":
         {'detector_type': 'hyper_deepsic'},
         {'detector_type': 'icl_detector'},
     ]
-    tasks_number_list = [100]
+    tasks_number_list = [1, 10, 50, 100, 200]
     seeds = range(2, 3)
 
     # path for the saved figure
