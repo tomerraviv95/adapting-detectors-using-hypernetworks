@@ -13,9 +13,9 @@ if __name__ == "__main__":
     params_list = [
         {'detector_type': 'joint_deepsic'},
         {'detector_type': 'hyper_deepsic'},
-        {'detector_type': 'icl_detector'}
+        {'detector_type': 'online_deepsic'}
     ]
-    seeds = range(1, 2)
+    seeds = range(1, 4)
 
     # path for the saved figure
     current_day_time = datetime.now()
