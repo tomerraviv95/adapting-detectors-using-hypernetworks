@@ -13,7 +13,8 @@ mpl.rcParams['legend.fontsize'] = 20
 mpl.rcParams['mathtext.fontset'] = 'stix'
 mpl.rcParams['font.family'] = 'STIXGeneral'
 
-COLORS_DICT = {'Hypernetwork-based DeepSIC': 'red',
+COLORS_DICT = {'RNN Hypernetwork-based DeepSIC':'brown',
+                   'Hypernetwork-based DeepSIC': 'red',
                'Joint DeepSIC': 'orange',
                'Online DeepSIC': 'blue',
                'ICL Detector': 'brown'}
@@ -21,9 +22,11 @@ COLORS_DICT = {'Hypernetwork-based DeepSIC': 'red',
 MARKERS_DICT = {'Hypernetwork-based DeepSIC': 'd',
                 'Joint DeepSIC': 'd',
                 'Online DeepSIC': 'x',
-                'ICL Detector': 'p'}
+                'ICL Detector': 'p',
+                'RNN Hypernetwork-based DeepSIC': 'p'}
 
 LINESTYLES_DICT = {'Hypernetwork-based DeepSIC': 'solid',
                    'Joint DeepSIC': 'dotted',
                    'Online DeepSIC': 'solid',
-                   'ICL Detector': 'dashed'}
+                   'ICL Detector': 'dashed',
+                   'RNN Hypernetwork-based DeepSIC': 'dashed'}

@@ -14,11 +14,10 @@ if __name__ == "__main__":
         {'detector_type': 'joint_deepsic'},
         {'detector_type': 'online_deepsic'},
         {'detector_type': 'hyper_deepsic'},
-        {'detector_type': 'icl_detector'},
     ]
 
-    pilot_sizes = [100, 200, 300, 400]
-    seeds = range(2, 3)
+    pilot_sizes = [200, 400, 600, 800, 1000]
+    seeds = range(1, 6)
 
     # path for the saved figure
     current_day_time = datetime.now()

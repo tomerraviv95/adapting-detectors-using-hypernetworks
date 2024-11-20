@@ -16,7 +16,7 @@ if __name__ == "__main__":
         {'detector_type': 'hyper_deepsic'},
     ]
     cost_snrs = [10, 12, 14, 16]
-    seeds = range(1, 2)
+    seeds = range(1, 5)
 
     # path for the saved figure
     current_day_time = datetime.now()

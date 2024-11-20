@@ -7,8 +7,8 @@ from torch.nn import RNN
 from python_code import DEVICE
 from python_code.utils.constants import MAX_USERS
 
-EMB = 24
-NUM_LAYERS = 3
+EMB = 64
+NUM_LAYERS = 2
 
 
 class Hypernetwork(nn.Module):

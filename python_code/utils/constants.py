@@ -9,6 +9,7 @@ class DetectorType(Enum):
     joint_deepsic = 'joint_deepsic'
     hyper_deepsic = 'hyper_deepsic'
     icl_detector = 'icl_detector'
+    rnn_hyper_deepsic = 'rnn_hyper_deepsic'
 
 
 class Phase(Enum):

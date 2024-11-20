@@ -66,6 +66,7 @@ class Trainer(nn.Module):
         Detects the batch of received words -> estimated transmitted words
         """
         with torch.no_grad():
+            self.adapt_network(detector_util.n_users)
             # initialize the states of new users entering the network
             probs_vec = HALF * torch.ones([rx.shape[0], detector_util.n_users]).to(DEVICE).float()
             # detect using all iterations
@@ -73,7 +74,11 @@ class Trainer(nn.Module):
                 probs_vec = self._calculate_posteriors(i + 1, probs_vec, rx, detector_util)
             # get symbols from probs
             detected_words = self._symbols_from_prob(probs_vec)
+            self.prev_users = detector_util.n_users
             return detected_words
+
+    def adapt_network(self,n_users):
+        pass
 
     def count_parameters(self):
         smallest_model = list(self.detector.values())[0][0]

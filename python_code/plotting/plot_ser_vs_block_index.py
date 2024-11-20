@@ -11,9 +11,10 @@ from python_code.plotting import *
 
 if __name__ == "__main__":
     params_list = [
-        {'detector_type': 'joint_deepsic'},
         {'detector_type': 'hyper_deepsic'},
-        {'detector_type': 'online_deepsic'}
+        {'detector_type': 'joint_deepsic'},
+        # {'detector_type': 'online_deepsic'},
+        {'detector_type': 'rnn_hyper_deepsic'}
     ]
     seeds = range(1, 4)
 

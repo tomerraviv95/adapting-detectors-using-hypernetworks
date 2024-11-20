@@ -39,7 +39,7 @@ class Evaluator(object):
                                                         phase=Phase.TEST)
         # if training is offline, either load the weights or train the detector for this config
         if conf.detector_type in [DetectorType.joint_deepsic.name, DetectorType.hyper_deepsic.name,
-                                  DetectorType.icl_detector.name]:
+                                  DetectorType.icl_detector.name, DetectorType.rnn_hyper_deepsic.name]:
             if not os.path.isdir(WEIGHTS_DIR):
                 os.makedirs(WEIGHTS_DIR)
             run_path = self.get_run_path()
