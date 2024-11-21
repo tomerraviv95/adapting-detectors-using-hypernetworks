@@ -3,17 +3,16 @@ import os
 import numpy as np
 import scipy.io
 
-from dir_definitions import COST2100_TRAIN_DIR, COST2100_TEST_DIR
+from dir_definitions import QUADRIGA_TEST_DIR, QUADRIGA_TRAIN_DIR
 from python_code.utils.config_singleton import Config
 from python_code.utils.constants import Phase
 
 conf = Config()
 
-SCALING_COEF = 0.35
-MIN_POWER, MAX_POWER = -70, -20
+SCALING_COEF = 0.7
 
 
-class COSTChannel:
+class QuadrigaChannel:
 
     @staticmethod
     def get_snrs(n_user: int, index: int, phase: Phase) -> np.ndarray:
@@ -22,28 +21,24 @@ class COSTChannel:
 
     @staticmethod
     def get_channel_matrix(n_ant: int, n_user: int, index: int, phase: Phase) -> np.ndarray:
-        # load the channel coefficients
-        total_h = np.empty([n_user, n_ant])
-        for i in range(1, n_ant + 1):
-            if phase == Phase.TRAIN:
-                # train using different channels
-                channel = 1 + index // conf.tasks_number
-                path_to_ant_mat = os.path.join(COST2100_TRAIN_DIR, f'channel_{channel}_ant_{i}.mat')
-            else:
-                # test on channel 0
-                path_to_ant_mat = os.path.join(COST2100_TEST_DIR, f'channel_0_ant_{i}.mat')
-            total_h_user = scipy.io.loadmat(path_to_ant_mat)['h_omni_power']
-            # assume max and min threshold for the analog power reception
-            norm_h_user = (total_h_user - MIN_POWER) / (MAX_POWER - MIN_POWER)
-            # only take the channel coefs up to the current online users
-            cur_h_user = norm_h_user[:n_user, index % norm_h_user.shape[1]]
-            total_h[:, i - 1] = SCALING_COEF * cur_h_user  # reduce side-lobes via beamforming
+        # load matrices of size n_user X n_ant X total_frames (100 in this case)
+        if phase == Phase.TRAIN:
+            # train using different channels
+            channel = 1 + index // conf.tasks_number
+            path_to_ant_mat = os.path.join(QUADRIGA_TRAIN_DIR, f'channel_magnitudes_{channel}.mat')
+        else:
+            # test on channel 0
+            path_to_ant_mat = os.path.join(QUADRIGA_TEST_DIR, f'channel_magnitudes_0.mat')
+        norm_h_user = scipy.io.loadmat(path_to_ant_mat)['magnitudes']
+        norm_h_user /= norm_h_user.max()
+        # adjust to the current n_users and n_ant configurations, assuming that n_ant >= n_user
+        norm_h_user = norm_h_user[:n_user, :n_ant, index % norm_h_user.shape[2]]
         # beamforming (beam focusing) for each user
-        total_h[np.arange(n_user), np.arange(n_user)] = 1
-        if np.any(total_h < 0) or np.any(total_h > 1):
+        norm_h_user[np.arange(n_user), np.arange(n_user)] = 1
+        if np.any(norm_h_user < 0) or np.any(norm_h_user > 1):
             print('Error in the normalization of the channel! values out of range')
             raise ValueError('Fail')
-        return total_h
+        return norm_h_user
 
     @staticmethod
     def transmit(s: np.ndarray, H: np.ndarray, snrs_db: np.ndarray) -> np.ndarray:

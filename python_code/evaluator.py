@@ -65,8 +65,13 @@ class Evaluator(object):
         if (not conf.train_test_mismatch and conf.channel_type == ChannelType.SED.name) or \
                 (conf.train_test_mismatch and conf.channel_type == ChannelType.COST.name):
             run_name += ChannelType.SED.name
-        else:
+        elif (not conf.train_test_mismatch and conf.channel_type == ChannelType.COST.name) or \
+                (conf.train_test_mismatch and conf.channel_type == ChannelType.SED.name):
             run_name += ChannelType.COST.name + "_" + str(conf.cost_snr)
+        elif (conf.channel_type == ChannelType.QUADRIGA.name):
+            run_name += ChannelType.QUADRIGA.name + "_" + str(conf.cost_snr)
+        else:
+            raise ValueError("Not supported channel model! Enter one of the three [SED,COST,QUADRIGA]")
         if conf.detector_type == DetectorType.icl_detector.name:
             run_name += f'_prompt_len_{conf.prompt_seq_length}'
         run_name += f'_tasks_{conf.tasks_number}'

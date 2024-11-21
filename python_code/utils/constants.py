@@ -20,6 +20,7 @@ class Phase(Enum):
 class ChannelType(Enum):
     SED = 'SED'
     COST = 'COST'
+    QUADRIGA = 'QUADRIGA'
 
 
 DetectorUtil = namedtuple("DetectorUtil", "H_hat n_users", defaults=[None, None])

@@ -2,10 +2,12 @@ import numpy as np
 
 from python_code import conf
 from python_code.datasets.channels.cost_channel import COSTChannel
+from python_code.datasets.channels.quadriga_channel import QuadrigaChannel
 from python_code.datasets.channels.sed_channel import SEDChannel
 from python_code.utils.constants import Phase, ChannelType
 
 CHANNELS_DICT = {ChannelType.SED.name: SEDChannel,
+                 ChannelType.QUADRIGA.name: QuadrigaChannel,
                  ChannelType.COST.name: COSTChannel}
 
 
